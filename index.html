@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Evaine Sun — Digital Interpretation for Cultural Heritage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F2EF;
+    --ink: #1D1D1B;
+    --muted: #97948E;
+    --rule: #1D1D1B;
+    --rule-soft: rgba(29,29,27,.14);
+    --accent: #F18430;
+    --menu-bg: #FFFFFF;
+    --shadow: 0 30px 60px -30px rgba(40,28,15,.45);
+    --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --card: #F9F8F5;
+    --wash: #EEECE8;   /* soft neutral white-out over background projects */
+    --gutter: clamp(1.5rem, 4vw, 3.5rem);
+    /* Featured card width: shrinks before it can crowd the intro column */
+    --cw: clamp(360px, calc(100vw - 50rem), 640px);
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;   /* display font (headlines + name) */
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1A1917; --ink: #ECEAE4; --muted: #8C8981; --rule: #ECEAE4;
+      --rule-soft: rgba(236,234,228,.16); --menu-bg: #262522;
+      --shadow: 0 30px 60px -30px rgba(0,0,0,.8);
+      --wash: #1F1E1C;
+      --card: #22211F;
+    }
+  }
+  :root[data-theme="dark"] {
+    --card: #22211F;
+    --wash: #1F1E1C;
+    --bg: #1A1917; --ink: #ECEAE4; --muted: #8C8981; --rule: #ECEAE4;
+    --rule-soft: rgba(236,234,228,.16); --menu-bg: #262522;
+    --shadow: 0 30px 60px -30px rgba(0,0,0,.8);
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; min-height: 100%;
+    background: var(--bg); color: var(--ink);
+    font-family: var(--sans); font-size: 16px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  /* ---------- Header ---------- */
+  .site-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.6rem var(--gutter);
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 500;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s, padding .35s cubic-bezier(.2,.7,.2,1);
+  }
+  .site-header.is-scrolled { border-color: var(--rule-soft); }
+  html { scroll-padding-top: calc(5.5rem + env(safe-area-inset-top, 0px)); }
+  .brand { font-family: var(--serif); font-size: 1.4rem; font-weight: 400; letter-spacing: -.01em; }
+  .nav { display: flex; white-space: nowrap; gap: clamp(1.25rem, 2.6vw, 2.25rem); align-items: center; font-size: .875rem; }
+  .nav-link, .nav-trigger {
+    position: relative; padding: .35rem 0; display: inline-flex; align-items: center; gap: .35rem;
+    color: color-mix(in srgb, var(--ink) 70%, var(--bg));
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+    transition: background-size .35s cubic-bezier(.2,.7,.2,1), color .3s;
+  }
+  .nav-link:hover, .nav-trigger:hover, .nav-item.is-open .nav-trigger {
+    color: var(--ink); background-size: 100% 1px; background-position: 0 100%;
+  }
+  .nav-link[aria-current="page"] {
+    color: var(--ink); font-weight: 500;
+    background-image: linear-gradient(var(--ink), var(--ink)); background-size: 100% 1px;
+  }
+  .nav-link[aria-current="page"]:hover { background-image: linear-gradient(var(--accent), var(--accent)); }
+  .nav-item:hover .nav-trigger svg, .nav-item.is-open .nav-trigger svg { color: var(--accent); }
+  .nav-trigger svg { width: 12px; height: 12px; transition: transform .3s cubic-bezier(.2,.7,.2,1), color .3s; }
+  .nav-item { position: relative; }
+  .nav-item:hover .nav-trigger svg, .nav-item:focus-within .nav-trigger svg, .nav-item.is-open .nav-trigger svg { transform: rotate(180deg); }
+  .menu {
+    position: absolute; top: calc(100% + .6rem); left: -.85rem;
+    background: color-mix(in srgb, var(--bg) 96%, transparent); border: 0; border-radius: 0;
+    padding: .5rem .85rem; list-style: none; margin: 0; white-space: nowrap; min-width: calc(100% + 1.7rem);
+    box-shadow: 0 6px 18px -8px rgba(0,0,0,.35);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    opacity: 0; transform: translateY(-6px); pointer-events: none;
+    transition: opacity .2s, transform .25s cubic-bezier(.2,.7,.2,1);
+  }
+  /* invisible bridge so the menu stays open while the pointer crosses the gap */
+  .menu::before { content: ""; position: absolute; left: 0; right: 0; top: -.8rem; height: .8rem; }
+  .nav-item:hover .menu, .nav-item:focus-within .menu, .nav-item.is-open .menu {
+    opacity: 1; transform: none; pointer-events: auto;
+  }
+  /* items read exactly like the nav links: same size, soft ink → ink, orange underline draws in */
+  .menu a {
+    display: flex; align-items: center; justify-content: space-between; gap: 1.25rem;
+    padding: .3rem 0; font-size: .8125rem;
+    color: color-mix(in srgb, var(--ink) 70%, var(--bg));
+    transition: color .3s;
+  }
+  .menu a span {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+    transition: background-size .35s cubic-bezier(.2,.7,.2,1); padding-bottom: 2px;
+  }
+  .menu-ext { width: 10px; height: 10px; flex: none; color: var(--muted); opacity: .7; transition: transform .35s cubic-bezier(.2,.7,.2,1), color .3s, opacity .3s; }
+  .menu a:hover, .menu a:focus-visible { color: var(--ink); }
+  .menu a:hover span, .menu a:focus-visible span { background-size: 100% 1px; background-position: 0 100%; }
+  .menu a:hover .menu-ext, .menu a:focus-visible .menu-ext { color: var(--accent); opacity: 1; transform: translate(2px, -2px); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(19rem, 27rem) minmax(0, 1fr);
+    position: relative;
+    height: calc(100svh - 5.4rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    min-height: 540px;
+    padding-left: var(--gutter);
+  }
+  .intro {
+    grid-column: 1; grid-row: 1; position: relative; z-index: 2; pointer-events: none;
+    display: flex; flex-direction: column; justify-content: flex-start;
+    padding-top: clamp(4rem, 16vh, 9rem); padding-right: 2rem;
+  }
+  .intro .cs-index { pointer-events: auto; }
+
+  /* Seal mark — sits after the name like a signature stamp; static */
+  .brand { display: inline-flex; align-items: center; gap: .7rem; }
+  .seal {
+    flex: none; width: 34px; height: 34px; position: relative;
+    border: 2.5px solid var(--accent);
+    transform: translateY(1px);
+  }
+  .seal::before { content: ""; position: absolute; inset: 2px; border: 1px solid var(--accent); }
+
+  .intro h1 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(2.1rem, 3vw, 2.6rem); line-height: 1.1; letter-spacing: -.015em;
+    margin: 0 0 1.5rem;
+  }
+  .intro p { margin: 0; max-width: 20rem; font-size: .9375rem; line-height: 1.65; color: color-mix(in srgb, var(--ink) 72%, var(--bg)); }
+  .intro a, .intro h1, .intro p { pointer-events: auto; }
+
+  /* Project labels (travel with their card) */
+  .plabel {
+    position: absolute; top: 0; left: 0; z-index: 250;
+    display: block; text-align: right; white-space: nowrap;
+    padding: .2rem 1.1rem .3rem 0; border-right: 1px solid var(--rule-soft);
+    color: var(--muted);
+    will-change: transform, opacity;
+    transition: border-color .35s, color .35s;
+  }
+  .plabel-title { display: block; font-size: .875rem; font-weight: 600; letter-spacing: .005em; }
+  .plabel-title span {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+    transition: background-size .35s cubic-bezier(.2,.7,.2,1); padding-bottom: 1px;
+  }
+  .plabel-sub { display: block; font-size: .75rem; color: color-mix(in srgb, var(--muted) 70%, var(--bg)); margin-top: .4rem; transition: color .35s; }
+  .plabel.is-current, .m-info { color: var(--ink); border-color: var(--rule); }
+  .plabel.is-current .plabel-title, .m-info .plabel-title { font-size: .875rem; font-weight: 600; }  /* emphasis comes from colour only */
+  .plabel.is-current .plabel-sub, .m-info .plabel-sub { color: var(--muted); }
+  .plabel:hover { color: var(--ink); border-color: var(--accent); }
+  .plabel:hover .plabel-title span { background-size: 100% 1px; background-position: 0 100%; }
+  .plabel:hover .plabel-sub { color: var(--muted); }
+  .m-info { display: none; }
+
+
+  /* Wheel stage */
+  .stage {
+    grid-column: 1 / -1; grid-row: 1;
+    position: relative; overflow: hidden;
+    perspective: 1500px; perspective-origin: 50% 50%;
+    touch-action: none; user-select: none; -webkit-user-select: none;
+    cursor: grab; outline: none;
+  }
+  .stage.is-dragging { cursor: grabbing; }
+  .stage:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
+  .wheel { position: absolute; inset: 0; }
+  .card {
+    position: absolute; top: 42%; left: calc(100% - var(--cw) / 2);
+    width: var(--cw); aspect-ratio: 16 / 9;
+    will-change: transform, opacity;
+    -webkit-user-drag: none;
+  }
+  .card-inner {
+    position: absolute; inset: 0; overflow: hidden; background: #3a2a1d;
+    box-shadow: var(--shadow);
+    transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .45s;
+  }
+  .card-media {
+    position: absolute; inset: 0;
+    filter: saturate(calc(1 - var(--gray, 0) * .68)) contrast(calc(1 - var(--gray, 0) * .1));
+    transition: transform .8s cubic-bezier(.2,.7,.2,1), filter .35s;
+  }
+  .card:not(.is-active):hover .card-media { filter: saturate(calc(1 - var(--gray, 0) * .2)); }
+  .card-media svg, .card-media img, .card-media video { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .card-inner::after {
+    content: ""; position: absolute; inset: 0; background: var(--wash);
+    opacity: var(--dim, 0); transition: opacity .3s; pointer-events: none;
+  }
+  .card:not(.is-active):hover .card-inner::after { opacity: calc(var(--dim, 0) * .35); }
+  .card:not(.is-active) { cursor: pointer; }
+  .card.is-active .card-inner { cursor: pointer; }
+  .card.is-active:hover .card-inner { box-shadow: 0 44px 70px -30px rgba(40,28,15,.55); }
+  .card.is-active:hover .card-media { transform: scale(1.045); }
+
+  /* Shared overlay button: used by "View project" and the scroll hint */
+  .card-cta, .hint {
+    height: 40px; border-radius: 20px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(20,16,12,.45); color: #F4EFE6;
+    border: 1px solid rgba(255,255,255,.22);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    transition: border-color .3s, background .3s, opacity .35s, transform .4s cubic-bezier(.2,.7,.2,1);
+  }
+  .card-cta:hover, .hint:hover, .hint:focus-visible {
+    border-color: var(--accent); background: rgba(20,16,12,.7);
+  }
+  .card-cta {
+    position: absolute; left: var(--edge, 1rem); bottom: var(--edge, 1rem); z-index: 2;
+    gap: .5rem; padding: 0 .95rem 0 1.05rem; font-size: .8rem; font-weight: 500;
+    opacity: 0; transform: translateY(8px); pointer-events: none;
+  }
+  .card-cta svg { width: 12px; height: 12px; transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+    /* Same language as the nav + page buttons: plain text, orange underline draws in */
+  /* Solid page-coloured tab: readable on any image, same text + underline language */
+  .card-cta {
+    background: color-mix(in srgb, var(--bg) 94%, transparent); border: 0; border-radius: 0;
+    height: 32px; padding: 0 .75rem; gap: .35rem;
+    bottom: calc(var(--edge, 1rem) + 4px);
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    font-weight: 500; font-size: .75rem; color: var(--ink);
+    box-shadow: 0 6px 18px -8px rgba(0,0,0,.35);
+  }
+  .card-cta span {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+    transition: background-size .45s cubic-bezier(.2,.7,.2,1) .05s; padding-bottom: 2px;
+  }
+  .card.is-active:hover .card-cta, .card.is-active:focus-visible .card-cta {
+    opacity: 1; transform: none; pointer-events: auto;
+  }
+  .card.is-active:hover .card-cta span, .card.is-active:focus-visible .card-cta span {
+    background-size: 100% 1px; background-position: 0 100%;
+  }
+  .card-cta:hover { background: var(--bg); }
+  .card-cta:hover svg { color: var(--accent); }
+  /* soft shade behind the link so it reads on light images too */
+  .card-scrim {
+    position: absolute; inset: 55% 45% 0 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(120% 100% at 0% 100%, rgba(15,12,9,.45), rgba(15,12,9,0) 70%);
+    opacity: 0; transition: opacity .4s;
+  }
+  .card-scrim { display: none; }
+  .card.is-active:hover .card-cta svg { transform: translate(2px, -2px); }
+
+  .hint {
+    position: absolute; z-index: 200; width: 40px; padding: 0; cursor: pointer;
+    transition: border-color .3s, background .3s, opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1);
+  }
+  .hint i { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+  .hint:hover i { transform: translateY(2px); }
+  .hint.is-hidden { opacity: 0; transform: translateY(6px); pointer-events: none; }
+  .hint i {
+    display: block; width: 14px; height: 22px; border: 1px solid rgba(255,255,255,.85); border-radius: 8px; position: relative;
+  }
+  .hint i::after {
+    content: ""; position: absolute; left: 50%; top: 4px; width: 2px; height: 5px; margin-left: -1px;
+    background: rgba(255,255,255,.9); border-radius: 1px; animation: nudge 1.8s infinite;
+  }
+  @keyframes nudge { 0%{transform:translateY(0);opacity:1} 70%{transform:translateY(7px);opacity:0} 100%{opacity:0} }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+
+  [hidden] { display: none !important; }
+  /* page switch: old page eases out, new page eases in */
+  .page { transition: opacity .38s cubic-bezier(.2,.7,.2,1), transform .5s cubic-bezier(.2,.7,.2,1); }
+  .page.is-leaving { opacity: 0; transform: translateY(-10px); }
+  .page.is-entering { opacity: 0; transform: translateY(14px); transition: none; }
+
+  /* ---------- Case studies page ---------- */
+  .cases {
+    --csw: clamp(380px, calc(100vw - 50rem), 760px);
+    display: grid; grid-template-columns: minmax(19rem, 27rem) minmax(0, 1fr);
+    padding-left: var(--gutter); padding-bottom: clamp(5rem, 14vh, 9rem);
+  }
+  .cases-intro {
+    position: sticky; top: 0; align-self: start;
+    padding-top: clamp(3.5rem, 12vh, 7rem); padding-right: 2rem;
+  }
+  .cases-intro h1 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(2.1rem, 3vw, 2.6rem); line-height: 1.1; letter-spacing: -.015em;
+    margin: 0 0 1.5rem;
+  }
+  .cases-intro p {
+    margin: 0; max-width: 20rem; font-size: .9375rem; line-height: 1.65;
+    color: color-mix(in srgb, var(--ink) 72%, var(--bg));
+  }
+  .cs-index { list-style: none; margin: 2.75rem 0 0; padding: 0; display: grid; gap: .6rem; }
+  .cs-index button {
+    display: flex; gap: .9rem; align-items: baseline; text-align: left;
+    font-size: .8125rem; color: var(--muted); transition: color .3s;
+  }
+  .cs-index button b { font-weight: 500; font-variant-numeric: tabular-nums; }
+  .cs-index button span {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+    transition: background-size .35s cubic-bezier(.2,.7,.2,1); padding-bottom: 2px;
+  }
+  .cs-index button.is-current { color: var(--ink); }
+  .cs-index button.is-current b { font-weight: 600; }
+  .cs-index button:hover { color: var(--ink); }
+  .cs-index button:hover span { background-size: 100% 1px; background-position: 0 100%; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: .45rem; margin-bottom: 2rem;
+    font-size: .8125rem; color: color-mix(in srgb, var(--ink) 70%, var(--bg)); transition: color .3s;
+  }
+  .back-link svg { width: 13px; height: 13px; transition: transform .3s cubic-bezier(.2,.7,.2,1); }
+  .back-link span {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+    transition: background-size .35s cubic-bezier(.2,.7,.2,1); padding-bottom: 2px;
+  }
+  .back-link:hover { color: var(--ink); }
+  .back-link:hover svg { transform: translateX(-3px); color: var(--accent); }
+  .back-link:hover span { background-size: 100% 1px; background-position: 0 100%; }
+  .cs-kicker { display: block; font-size: .8125rem; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; margin-bottom: .9rem; }
+  .cases-intro .cs-meta {
+    grid-template-columns: 1fr; gap: .4rem; margin-top: 1.75rem; max-width: 22rem;
+  }
+  .cases-intro .cs-meta > div { display: grid; grid-template-columns: 4.5rem 1fr; }
+  .cases-intro .cs-meta dt { margin: 0; font-size: .8125rem; }
+  .cases-intro .cs-index { margin-top: 2rem; }
+  #csd .cases-intro {
+    top: var(--header-h, 5.4rem);
+    padding-top: clamp(1.75rem, 6vh, 3.5rem); padding-bottom: 1.5rem;
+    min-width: 0;
+  }
+  /* project + case study pages: a wider left column so its text wraps less */
+  #csd:not(.is-main) .cases { grid-template-columns: minmax(20rem, 31rem) minmax(0, 1fr); --csw: clamp(380px, calc(100vw - 54rem), 740px); }
+  #csd:not(.is-main) .cs-summary { max-width: 27rem; }
+  #csd:not(.is-main) .cs-meta { max-width: 27rem; }
+  /* a little breathing room on the left so the back-arrow's hover nudge isn't clipped */
+  #csd .cases-intro { padding-left: 8px; margin-left: -8px; }
+  /* Left column on project / case study pages: same type scale as the main pages */
+  #csd .cases-intro { padding-top: clamp(1.5rem, 5vh, 3rem); padding-bottom: 1.5rem; }
+  #csd .cases-intro h1 { font-size: clamp(1.9rem, 2.7vw, 2.4rem); line-height: 1.1; overflow-wrap: anywhere; margin-bottom: 1.1rem; }
+  #csd .cs-summary { font-size: .9375rem; line-height: 1.65; max-width: 22rem; color: color-mix(in srgb, var(--ink) 72%, var(--bg)); }
+  #csd .back-link { font-size: .8125rem; margin-bottom: 1.6rem; }
+  #csd .cs-kicker { font-size: .8125rem; margin-bottom: .8rem; }
+  #csd .cs-meta { font-size: .8125rem; margin-top: 1.6rem; padding-top: 1.4rem; gap: .5rem; }
+  #csd .cs-meta dt { font-size: .8125rem; }
+  #csd .cs-meta > div { grid-template-columns: 5.5rem 1fr; }
+  #csd .cs-index {
+    font-size: .8125rem; margin-top: 2rem; max-width: 26rem;
+    grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, auto); grid-auto-flow: column;
+    gap: .6rem 1.8rem;
+  }
+  #csd .cs-index button { font-size: 1em; gap: .9rem; }
+
+  /* About: left column styled like the Projects / Case Studies main pages */
+  #csd.is-main .cs-kicker, #csd.is-main .cs-meta, #csd.is-main .back-link { display: none; }
+  #csd.is-main .cases-intro, #csd.is-main .cs-list {
+    /* matches the wheel pages: headline top = featured image top (42% of the hero, minus half an image) */
+    padding-top: max(1.5rem, calc(.42 * max(540px, 100svh - 5.4rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) - var(--cw) * .28125));
+  }
+  #csd.is-main .cases-intro h1 { font-size: clamp(2.1rem, 3vw, 2.6rem); line-height: 1.1; letter-spacing: -.015em; margin: 0 0 1.5rem; }
+  #csd.is-main .cs-summary { font-size: .9375rem; line-height: 1.65; max-width: 20rem; color: color-mix(in srgb, var(--ink) 72%, var(--bg)); }
+  #csd.is-main .cs-index {
+    font-size: .8125rem; margin-top: 2.75rem; max-width: none;
+    grid-template-columns: 1fr; grid-auto-flow: row; gap: .6rem;
+  }
+  #csd.is-main .cs-index button { gap: .9rem; }
+  #csd .cs-list { padding-top: clamp(1.75rem, 6vh, 3.5rem); padding-bottom: 0; }
+  #csd .cases { padding-bottom: 0; }
+  .cs-list { display: flex; flex-direction: column; gap: clamp(5rem, 16vh, 9rem); padding-top: clamp(3.5rem, 12vh, 7rem); }
+  .cs {
+    display: grid; grid-template-columns: minmax(0, 1fr) var(--csw);
+    column-gap: 28px; row-gap: 1.25rem; scroll-margin-top: 3rem;
+  }
+
+  /* label — same pattern as the project labels on the home page */
+  .cs-label {
+    grid-column: 1; grid-row: 1; justify-self: end; align-self: start;
+    text-align: right; white-space: nowrap;
+    padding: .2rem 1.1rem .3rem 0;
+    border-right: 1px solid color-mix(in srgb, var(--rule-soft) calc(var(--t, 0) * 100%), var(--rule));
+    color: color-mix(in srgb, var(--muted) calc(var(--t, 0) * 100%), var(--ink));
+    transition: border-color .3s;
+  }
+  .cs-label .plabel-title { font-size: .875rem; font-weight: 500; }
+  .cs.is-current .cs-label .plabel-title { font-weight: 600; }
+  .cs.is-current .cs-label .plabel-sub { color: var(--muted); }
+
+  .cs-media {
+    grid-column: 2; grid-row: 1; position: relative; display: block;
+    aspect-ratio: 16 / 9; overflow: hidden; background: var(--card, #F9F8F5);
+    box-shadow: var(--shadow); transition: box-shadow .45s;
+  }
+  .cs-art {
+    position: absolute; inset: 0;
+    filter: saturate(calc(1 - var(--t, 0) * .68)) contrast(calc(1 - var(--t, 0) * .1));
+    transition: transform .9s cubic-bezier(.2,.7,.2,1), filter .25s;
+  }
+  .cs-art svg, .cs-art > img, .cs-art > video { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .cs-media::after {
+    content: ""; position: absolute; inset: 0; background: var(--wash);
+    opacity: calc(var(--t, 0) * .35); transition: opacity .25s; pointer-events: none;
+  }
+  .cs-media:hover .cs-art { transform: scale(1.035); filter: saturate(calc(1 - var(--t, 0) * .2)); }
+  .cs-media:hover::after { opacity: calc(var(--t, 0) * .15); }
+  .cs.is-current .cs-media:hover { box-shadow: 0 44px 70px -30px rgba(40,28,15,.55); }
+
+  .cs-body {
+    grid-column: 2; grid-row: 2; padding-right: var(--gutter);
+    display: block; margin-left: 1.25rem; max-width: 32rem; padding-right: var(--gutter);
+    opacity: calc(1 - var(--t, 0) * .45);
+  }
+  .cs-body p { margin: 0; font-size: .8125rem; line-height: 1.7; color: color-mix(in srgb, var(--ink) 78%, var(--bg)); }
+  .cs-meta {
+    margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 1.5rem;
+    font-size: .8125rem; padding-top: 1.25rem; border-top: 1px solid var(--rule-soft);
+  }
+  .cs-meta dt { color: var(--muted); font-size: .75rem; margin-bottom: .25rem; }
+  .cs-meta dd { margin: 0; }
+
+  /* Section image gallery: several images per section, prev/next tab */
+  .cs-media { touch-action: pan-y; }
+  .cs-media.is-zoomable { cursor: zoom-in; }
+  .cs-slide {
+    position: absolute; inset: 0; opacity: 0; transform: translateX(2.5%);
+    transition: opacity .6s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1);
+  }
+  .cs-slide.is-prev { transform: translateX(-2.5%); }
+  .cs-slide.is-shown { opacity: 1; transform: none; }
+  .cs-slide svg, .cs-slide img, .cs-slide video { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .slide-cap {
+    position: absolute; left: 20px; bottom: 20px; z-index: 3; max-width: calc(100% - 190px);
+    padding: .4rem .6rem; font-size: .7rem; line-height: 1.45; color: var(--ink);
+    background: color-mix(in srgb, var(--bg) 62%, transparent);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    transition: opacity .3s;
+  }
+  .slide-cap:empty { display: none; }
+  /* Pause / play for autoplaying videos (appears on hover) */
+  .vid-toggle {
+    position: absolute; top: 14px; right: 14px; z-index: 4;
+    width: 32px; height: 32px; display: grid; place-items: center;
+    background: color-mix(in srgb, var(--bg) 94%, transparent); color: var(--ink);
+    box-shadow: 0 6px 18px -8px rgba(0,0,0,.35);
+    opacity: 0; transform: translateY(-4px); pointer-events: none;
+    transition: opacity .3s, transform .35s cubic-bezier(.2,.7,.2,1), color .3s;
+  }
+  .vid-toggle svg { width: 12px; height: 12px; }
+  .vid-toggle .i-play { display: none; }
+  .vid-toggle.is-paused .i-play { display: block; }
+  .vid-toggle.is-paused .i-pause { display: none; }
+  .vid-toggle:hover { color: var(--accent); }
+  .cs-media:hover > .vid-toggle.has-video, .hl-item:hover > .vid-toggle.has-video, .vid-toggle.has-video:focus-visible,
+  .vid-toggle.has-video.is-paused { opacity: 1; transform: none; pointer-events: auto; }
+  @media (hover: none) { .vid-toggle.has-video { opacity: 1; transform: none; pointer-events: auto; } }
+  .gallery-nav {
+    position: absolute; right: 20px; bottom: 20px; z-index: 3;
+    display: inline-flex; align-items: center; height: 32px;
+    background: color-mix(in srgb, var(--bg) 94%, transparent); color: var(--ink);
+    box-shadow: 0 6px 18px -8px rgba(0,0,0,.35);
+    transition: opacity .4s;
+  }
+  .cs:not(.is-current) .gallery-nav { opacity: .55; }
+  .gallery-nav button {
+    width: 32px; height: 32px; display: grid; place-items: center;
+    color: color-mix(in srgb, var(--ink) 65%, var(--bg)); transition: color .3s;
+  }
+  .gallery-nav button svg { width: 14px; height: 14px; transition: transform .3s cubic-bezier(.2,.7,.2,1); }
+  .gallery-nav button:hover { color: var(--accent); }
+  .gallery-nav .g-prev:hover svg { transform: translateX(-2px); }
+  .gallery-nav .g-next:hover svg { transform: translateX(2px); }
+  .gallery-count { font-size: .72rem; font-variant-numeric: tabular-nums; color: var(--muted); padding: 0 .15rem; min-width: 2.6rem; text-align: center; }
+  .gallery-count b { color: var(--ink); font-weight: 500; }
+
+  /* ---------- Project detail sections ---------- */
+  /* text-only section (Overview): text sits beside the label */
+  .cs--text .cs-body { grid-row: 1; margin-left: 0; max-width: 34rem; }
+  .cs--text .cs-body p { font-size: .9375rem; line-height: 1.75; }
+  .cs-body p + p { margin-top: .9em; }
+
+  /* Highlights: 2-column image grid, caption on hover */
+  .hl-grid {
+    grid-column: 2; grid-row: 1;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  .hl-item { cursor: zoom-in; position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #3a2a1d; box-shadow: 0 20px 40px -26px rgba(40,28,15,.5); }
+  .hl-item .cs-art img, .hl-item .cs-art video { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .hl-item .cs-art { transition: filter .25s, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .hl-item::after {
+    content: ""; position: absolute; inset: 0; background: var(--wash);
+    opacity: calc(var(--t, 0) * .35); transition: opacity .25s; pointer-events: none;
+  }
+  .hl-item:hover .cs-art { transform: scale(1.04); filter: saturate(calc(1 - var(--t, 0) * .2)); }
+  .hl-item:hover::after { opacity: calc(var(--t, 0) * .15); }
+  .hl-cap {
+    position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 2;
+    padding: .4rem .55rem; font-size: .66rem; line-height: 1.45;
+    background: color-mix(in srgb, var(--bg) 62%, transparent); color: var(--ink);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .35s, transform .4s cubic-bezier(.2,.7,.2,1);
+  }
+  .hl-item:hover .hl-cap, .hl-item:focus-visible .hl-cap { opacity: 1; transform: none; }
+
+  /* About: text-only sections (Experience, Education, Skills) use the same
+     typography and placement as a project's Overview: beside the label, no card */
+  .cs-rows, .cs-cols {
+    grid-column: 2; grid-row: 1; max-width: 34rem; padding-right: var(--gutter);
+    opacity: calc(1 - var(--t, 0) * .45);
+  }
+  .cs-row + .cs-row { margin-top: 1.5rem; }
+  .cs-row-title { font-size: .875rem; font-weight: 600; line-height: 1.5; }
+  .cs-row-org { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+  .cs-row-text { font-size: .8125rem; line-height: 1.7; margin: .45rem 0 0; color: color-mix(in srgb, var(--ink) 78%, var(--bg)); }
+  .cs-cols { max-width: 40rem; display: grid; grid-template-columns: repeat(var(--ncols, 3), minmax(0, 1fr)); gap: 1.75rem; }
+  .cs-col h3 { margin: 0 0 .55rem; font-size: .875rem; font-weight: 600; line-height: 1.5; }
+  .cs-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; font-size: .8125rem; line-height: 1.6; color: color-mix(in srgb, var(--ink) 78%, var(--bg)); }
+
+  /* inline text links (Contact) — same orange underline language */
+  .text-link {
+    color: var(--ink); font-weight: 500;
+    background-image: linear-gradient(var(--rule-soft), var(--rule-soft)), linear-gradient(var(--accent), var(--accent));
+    background-size: 100% 1px, 0% 1px; background-repeat: no-repeat; background-position: 0 100%, 100% 100%;
+    transition: background-size .4s cubic-bezier(.2,.7,.2,1); padding-bottom: 2px;
+  }
+  .text-link:hover { background-size: 100% 1px, 100% 1px; background-position: 0 100%, 0 100%; }
+  .link-row { display: flex; flex-wrap: wrap; gap: .6rem 1.75rem; margin-top: 1.25rem; font-size: .875rem; }
+
+  /* Lightbox for highlight images */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 1000;
+    display: grid; place-items: center; padding: 4.5rem 4rem 3.5rem;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    opacity: 0; pointer-events: none; transition: opacity .35s ease;
+  }
+  .lightbox.is-open { opacity: 1; pointer-events: auto; }
+  .lb-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: .9rem;
+    transform: scale(.97); transition: transform .45s cubic-bezier(.2,.7,.2,1); }
+  .lightbox.is-open .lb-figure { transform: none; }
+  .lb-frame {
+    position: relative; width: min(88vw, calc((100svh - 11rem) * 16 / 9)); aspect-ratio: 16 / 9;
+    overflow: hidden; background: #3a2a1d; box-shadow: 0 40px 80px -40px rgba(0,0,0,.55);
+  }
+  .lb-frame > div { position: absolute; inset: 0; transition: opacity .3s; }
+  .lb-frame svg, .lb-frame img, .lb-frame video { width: 100%; height: 100%; display: block; object-fit: contain; }
+  .lb-frame { background: #1c1a17; }
+  .lb-cap { font-size: .8125rem; color: color-mix(in srgb, var(--ink) 80%, var(--bg)); max-width: 40rem; text-align: center; line-height: 1.5; }
+  .lb-count { font-size: .72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .lb-count b { color: var(--ink); font-weight: 500; }
+  .lb-btn {
+    position: absolute; display: grid; place-items: center; width: 44px; height: 44px;
+    color: color-mix(in srgb, var(--ink) 65%, var(--bg)); transition: color .3s;
+  }
+  .lb-btn svg { width: 20px; height: 20px; transition: transform .3s cubic-bezier(.2,.7,.2,1); }
+  .lb-btn:hover { color: var(--accent); }
+  .lb-close { top: 1.25rem; right: 1.25rem; }
+  .lb-close:hover svg { transform: rotate(90deg); }
+  .lb-prev { left: 1rem; top: 50%; transform: translateY(-50%); }
+  .lb-next { right: 1rem; top: 50%; transform: translateY(-50%); }
+  .lb-prev:hover svg { transform: translateX(-3px); }
+  .lb-next:hover svg { transform: translateX(3px); }
+  body.lb-lock { overflow: hidden; }
+
+  /* Linked case study inside a project */
+  .cs-link { cursor: pointer; aspect-ratio: 16 / 9; }
+  .cs-link-cta {
+    position: absolute; left: 20px; bottom: 20px; z-index: 2;
+    height: 32px; padding: 0 .75rem; display: inline-flex; align-items: center; gap: .35rem;
+    background: color-mix(in srgb, var(--bg) 94%, transparent); color: var(--ink);
+    font-size: .75rem; font-weight: 500; box-shadow: 0 6px 18px -8px rgba(0,0,0,.35);
+    opacity: 0; transform: translateY(8px); transition: opacity .35s, transform .4s cubic-bezier(.2,.7,.2,1);
+  }
+  .cs-link-cta svg { width: 12px; height: 12px; transition: transform .35s cubic-bezier(.2,.7,.2,1), color .3s; }
+  .cs-link-cta span {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+    transition: background-size .45s cubic-bezier(.2,.7,.2,1) .05s; padding-bottom: 2px;
+  }
+  .cs-link:hover .cs-link-cta, .cs-media:hover > .cs-link-cta, .cs-media > .cs-link-cta:focus-visible { opacity: 1; transform: none; }
+  .cs-media:hover > .cs-link-cta span { background-size: 100% 1px; background-position: 0 100%; }
+  .cs-media:hover > .cs-link-cta svg { transform: translate(2px, -2px); color: var(--accent); }
+  .cs-link:hover .cs-link-cta span { background-size: 100% 1px; background-position: 0 100%; }
+  .cs-link:hover .cs-link-cta svg { transform: translate(2px, -2px); color: var(--accent); }
+
+  /* Next case study — centred across the whole page, below both columns */
+  .cs-next-wrap {
+    display: flex; justify-content: center;
+    padding: clamp(5rem, 16vh, 9rem) var(--gutter) clamp(2rem, 5vh, 3rem);   /* top = the gap between sections */
+    margin: 0 var(--gutter);
+  }
+  .cs-next { display: flex; flex-direction: column; align-items: center; text-align: center; width: min(400px, 100%); }
+  .cs-next-kicker { font-size: .72rem; letter-spacing: .02em; color: var(--muted); margin-bottom: .6rem; }
+  .cs-next-title { font-size: .8125rem; font-weight: 600; color: color-mix(in srgb, var(--ink) 75%, var(--bg)); transition: color .35s; }
+  .cs-next-title span {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+    transition: background-size .4s cubic-bezier(.2,.7,.2,1); padding-bottom: 2px;
+  }
+  .cs-next-sub { font-size: .75rem; color: var(--muted); margin-top: .4rem; }
+  .cs-next-media {
+    position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+    margin-top: 1rem; box-shadow: 0 20px 40px -24px rgba(40,28,15,.45);
+  }
+  .cs-next-media .cs-art { filter: saturate(.32) contrast(.9); transition: filter .5s, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .cs-next-media::after { content: ""; position: absolute; inset: 0; background: var(--wash); opacity: .3; transition: opacity .5s; pointer-events: none; }
+  .cs-next:hover .cs-next-title { color: var(--ink); }
+  .cs-next:hover .cs-next-title span { background-size: 100% 1px; background-position: 0 100%; }
+  .cs-next:hover .cs-next-media .cs-art { filter: none; transform: scale(1.03); }
+  .cs-next:hover .cs-next-media::after { opacity: 0; }
+  .cs-next-cta {
+    position: absolute; left: 50%; bottom: 12px; z-index: 2;
+    height: 28px; padding: 0 .75rem; display: inline-flex; align-items: center; gap: .35rem;
+    background: color-mix(in srgb, var(--bg) 94%, transparent); color: var(--ink);
+    font-size: .75rem; font-weight: 500; box-shadow: 0 6px 18px -8px rgba(0,0,0,.35);
+    opacity: 0; transform: translate(-50%, 8px); transition: opacity .35s, transform .4s cubic-bezier(.2,.7,.2,1);
+  }
+  .cs-next-cta svg { width: 12px; height: 12px; transition: transform .35s cubic-bezier(.2,.7,.2,1), color .3s; }
+  .cs-next:hover .cs-next-cta { opacity: 1; transform: translate(-50%, 0); }
+  .cs-next:hover .cs-next-cta svg { transform: translate(2px, -2px); color: var(--accent); }
+
+  /* Coming-soon pages (Photo Gallery, Blogs) */
+  .soon {
+    display: flex; flex-direction: column;
+    min-height: calc(100svh - 5.4rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
+  .soon-inner {
+    flex: 1; padding: 0 var(--gutter);
+    padding-top: max(1.5rem, calc(.42 * max(540px, 100svh - 5.4rem) - var(--cw) * .28125));
+    max-width: calc(27rem + var(--gutter) * 2);
+  }
+  .soon .cs-kicker { color: var(--accent); }
+  .soon h1 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(2.1rem, 3vw, 2.6rem); line-height: 1.1; letter-spacing: -.015em; margin: 0 0 1.5rem;
+  }
+  .soon p { margin: 0; font-size: .9375rem; line-height: 1.65; max-width: 22rem; color: color-mix(in srgb, var(--ink) 72%, var(--bg)); }
+  .soon .soon-sub { margin-top: 2.25rem; font-size: .8125rem; color: var(--muted); }
+  .soon-links { list-style: none; margin: .9rem 0 0; padding: 0; display: grid; gap: .6rem; }
+  .soon-links a {
+    display: inline-flex; align-items: center; gap: .6rem; font-size: .875rem;
+    color: color-mix(in srgb, var(--ink) 75%, var(--bg)); transition: color .3s;
+  }
+  .soon-links a span {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+    transition: background-size .35s cubic-bezier(.2,.7,.2,1); padding-bottom: 2px;
+  }
+  .soon-links svg { width: 12px; height: 12px; color: var(--muted); transition: transform .35s cubic-bezier(.2,.7,.2,1), color .3s; }
+  .soon-links a:hover { color: var(--ink); }
+  .soon-links a:hover span { background-size: 100% 1px; background-position: 0 100%; }
+  .soon-links a:hover svg { transform: translateX(3px); color: var(--accent); }
+
+  /* Copyright */
+  .intro .copyright { margin: auto 0 0; padding-top: 2rem; max-width: none; font-size: .72rem; line-height: 1.5; color: var(--muted); }
+  .intro { padding-bottom: clamp(1.25rem, 3.5vh, 2rem); }
+  .site-footer {
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    margin: 0 var(--gutter); padding: 1.25rem 0 clamp(1.5rem, 4vh, 2.25rem);
+    border-top: 1px solid var(--rule-soft); font-size: .72rem; color: var(--muted);
+  }
+  .site-footer a { color: inherit; transition: color .3s; }
+  .site-footer a:hover { color: var(--ink); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1024px) {
+    .hero { grid-template-columns: 1fr; height: auto; padding-right: var(--gutter); row-gap: 1.75rem; }
+    .intro { padding-top: 2.5rem; padding-right: 0; }
+    .hint, .plabel { display: none; }
+    .m-info { display: block; grid-row: 2; justify-self: start; text-align: left; border-right: 0; border-left: 1px solid var(--rule); padding: .2rem 0 .25rem 1rem; }
+    .stage { grid-row: 3; height: calc(max(90vw, 400px) + 4rem); margin-inline: calc(-1 * var(--gutter)); margin-bottom: 2rem; }
+    .card { width: min(78vw, 560px); left: 50%; top: calc((100% - 4rem) * .4); }
+  }
+  @media (max-width: 1024px) {
+    .cases { grid-template-columns: 1fr; padding-right: var(--gutter); }
+    .cases-intro { position: static; padding-right: 0; padding-top: 2.5rem; }
+    .cs-meta { grid-template-columns: 1fr; gap: .5rem; }
+    .cs-meta > div { display: grid; grid-template-columns: 5.5rem 1fr; }
+    .cs-meta dt { margin: 0; font-size: .8125rem; }
+    .cs-list { padding-top: 3rem; }
+    .cs { grid-template-columns: 1fr; }
+    .cs-label { grid-column: 1; grid-row: 1; justify-self: start; text-align: left; border-right: 0; border-left: 1px solid var(--rule-soft); padding: .2rem 0 .3rem 1rem; white-space: normal; }
+    .cs.is-current .cs-label { border-color: var(--rule); }
+    .cs-media { grid-column: 1; grid-row: 2; }
+    .cs-body { grid-column: 1; grid-row: 3; padding-right: 0; grid-template-columns: 1fr; gap: 1.25rem; }
+    #csd .cases-intro { max-height: none; overflow: visible; }
+    #csd:not(.is-main) .cases { grid-template-columns: 1fr; }
+    #csd .cs-list { padding-bottom: 2rem; }
+    .cs--text .cs-body { grid-row: 2; }
+    .hl-grid { grid-column: 1; grid-row: 2; padding-right: 0; gap: 10px; }
+    .cs-rows, .cs-cols { grid-column: 1; grid-row: 2; padding-right: 0; }
+    .cs-cols { grid-template-columns: 1fr 1fr; }
+    .hl-cap { opacity: 1; transform: none; position: static; margin-top: 0; box-shadow: none; background: none; padding: .5rem 0 0; }
+    .hl-item { overflow: visible; aspect-ratio: auto; box-shadow: none; background: none; }
+    .hl-item .cs-art { position: relative; aspect-ratio: 16 / 9; display: block; overflow: hidden; }
+    .hl-item::after { display: none; }
+    .cs-next-cta { opacity: 1; transform: translate(-50%, 0); }
+  }
+  @media (max-width: 640px) {
+    .nav { gap: 1rem; font-size: .8rem; }
+    .nav .hide-sm { display: none; }
+    .site-header { flex-wrap: wrap; gap: .75rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: .01ms !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="#" aria-label="Evaine Sun, home"><span>Evaine Sun</span><span class="seal" aria-hidden="true"></span></a>
+  <nav class="nav" aria-label="Primary">
+    <a class="nav-link" href="#" data-route="home" aria-current="page">Projects</a>
+    <a class="nav-link" href="#case-studies" data-route="cases">Case Studies</a>
+    <a class="nav-link" href="#about" data-route="about">About</a>
+    <div class="nav-item">
+      <button class="nav-trigger" aria-expanded="false" aria-haspopup="true">Contact
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 4.75 6 7.75l3-3"/></svg>
+      </button>
+      <ul class="menu">
+        <li><a href="mailto:evainesun@gmail.com"><span>Email</span><svg class="menu-ext" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10l6-6M5 4h5v5"/></svg></a></li>
+        <li><a href="https://www.linkedin.com/in/evainesun/" target="_blank" rel="noopener"><span>LinkedIn</span><svg class="menu-ext" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10l6-6M5 4h5v5"/></svg></a></li>
+      </ul>
+    </div>
+    <div class="nav-item">
+      <button class="nav-trigger" aria-expanded="false" aria-haspopup="true"><span><span class="hide-sm">Additional </span>Links</span>
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 4.75 6 7.75l3-3"/></svg>
+      </button>
+      <ul class="menu">
+        <li><a href="#photo-gallery"><span>Photo Gallery</span><svg class="menu-ext" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></li>
+        <li><a href="#blogs"><span>Blogs</span><svg class="menu-ext" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main class="hero page" id="home">
+  <section class="intro">
+    <div>
+      <h1>Digital Interpretation<br>for Cultural Heritage<br>and Education</h1>
+      <p>I design and develop digital experiences that connect people with culture, history, and place through technology and storytelling.</p>
+      <ul class="cs-index" id="projIndex"></ul>
+    </div>
+    <p class="copyright">© <span class="cy-year">2026</span> Evaine Sun. All rights reserved.</p>
+  </section>
+
+  <a class="m-info" id="mInfo" href="#">
+    <span class="plabel-title" id="mTitle"></span>
+    <span class="plabel-sub" id="mSub"></span>
+  </a>
+
+  <section class="stage" id="stage" tabindex="0" aria-roledescription="carousel" aria-label="Projects — scroll, drag, or use arrow keys">
+    <div class="wheel" id="wheel"></div>
+    <button class="hint" id="hint" aria-label="Next project (or scroll / drag to browse)" title="Scroll or drag to browse"><i></i></button>
+  </section>
+</main>
+
+<main class="hero page" id="cases" hidden>
+  <section class="intro">
+    <div>
+      <h1>Case Studies</h1>
+      <p>In-depth looks at how I research, design, and build digital interpretation projects, connecting physical space and digital platforms.</p>
+      <ul class="cs-index"></ul>
+    </div>
+    <p class="copyright">© <span class="cy-year">2026</span> Evaine Sun. All rights reserved.</p>
+  </section>
+
+  <a class="m-info" href="#"></a>
+
+  <section class="stage" tabindex="0" aria-roledescription="carousel" aria-label="Case studies — scroll, drag, or use arrow keys">
+    <div class="wheel"></div>
+    <button class="hint" aria-label="Next case study (or scroll / drag to browse)" title="Scroll or drag to browse"><i></i></button>
+  </section>
+</main>
+
+<main class="page soon" id="soon" hidden>
+  <section class="soon-inner">
+    <span class="cs-kicker">Coming soon</span>
+    <h1 id="soonTitle">Photo Gallery</h1>
+    <p id="soonText">This page is still being developed. Please check back soon.</p>
+    <p class="soon-sub">In the meantime, explore the rest of the site:</p>
+    <ul class="soon-links">
+      <li><a href="#"><span>Projects</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></li>
+      <li><a href="#case-studies"><span>Case Studies</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></li>
+      <li><a href="#about"><span>About</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></li>
+    </ul>
+  </section>
+  <footer class="site-footer"><span>© <span class="cy-year">2026</span> Evaine Sun. All rights reserved.</span></footer>
+</main>
+
+<main class="page" id="csd" hidden>
+  <div class="cases">
+    <section class="cases-intro">
+      <a class="back-link" href="#case-studies">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 7H2M6 3 2 7l4 4"/></svg>
+        <span class="back-text">Case Studies</span>
+      </a>
+      <span class="cs-kicker">Case Study 01</span>
+      <h1></h1>
+      <p class="cs-summary"></p>
+      <dl class="cs-meta"></dl>
+      <ul class="cs-index"></ul>
+    </section>
+    <section class="cs-list"></section>
+  </div>
+  <section class="cs-next-wrap"></section>
+  <footer class="site-footer"><span>© <span class="cy-year">2026</span> Evaine Sun. All rights reserved.</span><a href="#" onclick="scrollTo({top:0,behavior:'smooth'});return false;">Back to top ↑</a></footer>
+</main></main>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" hidden>
+  <button class="lb-btn lb-close" type="button" aria-label="Close">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 4l12 12M16 4 4 16"/></svg>
+  </button>
+  <button class="lb-btn lb-prev" type="button" aria-label="Previous image">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12.5 4 6.5 10l6 6"/></svg>
+  </button>
+  <figure class="lb-figure">
+    <div class="lb-frame"></div>
+    <figcaption class="lb-cap"></figcaption>
+    <span class="lb-count"></span>
+  </figure>
+  <button class="lb-btn lb-next" type="button" aria-label="Next image">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7.5 4l6 6-6 6"/></svg>
+  </button>
+</div>
+
+<script>
+/* ============================================================
+   CONTENT — edit this array to change projects.
+   Set `image` to a path/URL (e.g. "img/hearth.jpg") to replace
+   the illustrated placeholder with your real screenshot.
+   ============================================================ */
+const PROJECTS = [
+  { title: "3D-scanned Hearth",                        subtitle: "3D Digitization & Interactive Model",             href: "#project-01", image: "media/project1_highlight3.png", art: "hearth" },
+  { title: "Montclair Historic Map",                   subtitle: "Interactive Mapping & Archival Research",         href: "#project-02", image: "media/project2_cover.png", art: "map" },
+  { title: "Buddha Dipankara (Interactive Silk Road)", subtitle: "Multisensory Exhibition & 3D Digitization",       href: "#project-03", image: "media/project3_highlight1.png", art: "objects" },
+  { title: "Pharmacy Compounding Lab (Intrepid Museum)", subtitle: "Multisensory Exhibition & Digital Experience Design", href: "#project-04", image: "media/project4_highlight3.png", art: "exhibit" }
+];
+
+/* ---------- Placeholder artwork (inline SVG) ---------- */
+function rng(seed){ return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+
+const ART = {
+  hearth() {
+    let planks = "", bricks = "", herbs = "";
+    for (let x = 0; x < 1600; x += 64) planks += `<line x1="${x}" y1="250" x2="${x}" y2="900" stroke="#000" stroke-opacity=".18" stroke-width="2"/>`;
+    for (let y = 410; y < 900; y += 26) {
+      bricks += `<line x1="330" y1="${y}" x2="1050" y2="${y}" stroke="#2a180e" stroke-opacity=".5" stroke-width="2"/>`;
+      const off = ((y - 410) / 26) % 2 ? 0 : 36;
+      for (let x = 330 + off; x < 1050; x += 72) bricks += `<line x1="${x}" y1="${y}" x2="${x}" y2="${y+26}" stroke="#2a180e" stroke-opacity=".45" stroke-width="2"/>`;
+    }
+    [520, 600, 690, 800, 880, 980].forEach((x, i) => {
+      const len = 60 + (i % 3) * 22;
+      herbs += `<line x1="${x}" y1="244" x2="${x}" y2="${244+len}" stroke="#1a100a" stroke-width="2"/>
+        <ellipse cx="${x}" cy="${250+len}" rx="${14+(i%2)*6}" ry="${26+(i%3)*6}" fill="${i%2?'#9a8a5c':'#c9b78c'}" opacity=".9"/>`;
+    });
+    return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="hw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c130c"/><stop offset=".5" stop-color="#4b3120"/><stop offset="1" stop-color="#26180f"/></linearGradient>
+        <radialGradient id="hg" cx=".38" cy=".42" r=".65"><stop offset="0" stop-color="#f6c77f" stop-opacity=".5"/><stop offset="1" stop-color="#f6c77f" stop-opacity="0"/></radialGradient>
+        <radialGradient id="hf" cx=".5" cy="1" r=".75"><stop offset="0" stop-color="#ffa24a" stop-opacity=".95"/><stop offset=".45" stop-color="#8f3c12" stop-opacity=".55"/><stop offset="1" stop-color="#110905" stop-opacity="0"/></radialGradient>
+        <radialGradient id="hv" cx=".5" cy=".5" r=".78"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".7"/></radialGradient>
+        <linearGradient id="hwin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7e2"/><stop offset="1" stop-color="#d8c69d"/></linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#hw)"/>
+      ${planks}
+      <rect y="0" width="1600" height="70" fill="#120b07"/>
+      <rect y="100" width="1600" height="44" fill="#2e1e13"/>
+      <rect y="210" width="1600" height="38" fill="#231509"/>
+      <polygon points="1265,330 1505,330 1600,900 1180,900" fill="#f8e6bf" opacity=".06"/>
+      <rect x="1270" y="330" width="230" height="290" fill="url(#hwin)"/>
+      <path d="M1385 330v290M1270 475h230" stroke="#3a2616" stroke-width="9"/>
+      <rect x="1270" y="330" width="230" height="290" fill="none" stroke="#2a190e" stroke-width="14"/>
+      <rect x="330" y="385" width="720" height="515" fill="#5e3b27"/>
+      ${bricks}
+      <path d="M470 900V600q0-40 40-40h360q40 0 40 40v300z" fill="#120a06"/>
+      <rect x="470" y="560" width="440" height="340" fill="url(#hf)"/>
+      <rect x="560" y="830" width="260" height="26" rx="12" fill="#3a1f10" transform="rotate(-4 690 843)"/>
+      <rect x="580" y="848" width="230" height="24" rx="11" fill="#2c170b" transform="rotate(5 695 860)"/>
+      <rect x="280" y="352" width="820" height="28" fill="#2a1a0f"/>
+      <rect x="300" y="380" width="780" height="12" fill="#1a1009"/>
+      <rect x="360" y="296" width="38" height="56" rx="6" fill="#8a6440"/>
+      <rect x="420" y="312" width="30" height="40" rx="4" fill="#5a3f28"/>
+      <rect x="520" y="316" width="78" height="36" fill="#3b2a1c"/>
+      <rect x="650" y="286" width="22" height="66" rx="8" fill="#6b5a3a"/>
+      <ellipse cx="760" cy="330" rx="36" ry="24" fill="#7a5433"/>
+      <rect x="840" y="300" width="44" height="52" fill="#4c3524"/>
+      <rect x="930" y="318" width="60" height="34" rx="4" fill="#8b6a45"/>
+      ${herbs}
+      <circle cx="1130" cy="640" r="46" fill="#2a1a10"/><rect x="1105" y="585" width="50" height="12" fill="#1c120a"/>
+      <ellipse cx="1330" cy="760" rx="60" ry="72" fill="#6d5237"/><ellipse cx="1440" cy="780" rx="40" ry="50" fill="#51392a"/>
+      <rect width="1600" height="900" fill="url(#hg)"/>
+      <rect width="1600" height="900" fill="url(#hv)"/>
+    </svg>`;
+  },
+
+  map() {
+    const r = rng(42), fills = ["#e7c7bd", "#efe0ad", "#d3d8c6", "#e0d5c2", "#e9d2c9", "#dcd9cf"];
+    let blocks = "", dots = "";
+    for (let row = -3; row < 10; row++) for (let col = -3; col < 14; col++) {
+      const x = col * 170, y = row * 124;
+      blocks += `<rect x="${x}" y="${y}" width="152" height="106" fill="${fills[Math.floor(r()*fills.length)]}" stroke="#b9b2a4" stroke-width="1.5"/>`;
+      const parcels = 2 + Math.floor(r()*3);
+      for (let p = 1; p < parcels; p++) blocks += `<line x1="${x + 152*p/parcels}" y1="${y}" x2="${x + 152*p/parcels}" y2="${y+106}" stroke="#a79f90" stroke-width="1"/>`;
+      if (r() > .6) blocks += `<rect x="${x+10+r()*60}" y="${y+12+r()*40}" width="${26+r()*30}" height="${20+r()*24}" fill="#c98c7c" opacity=".7"/>`;
+    }
+    for (let i = 0; i < 34; i++) dots += `<circle cx="${80 + r()*1080}" cy="${60 + r()*740}" r="8" fill="#3a6fd0" stroke="#fff" stroke-width="3"/>`;
+    let checks = "";
+    ["Photo 01","Photo 02","Photo 03","Photo 04","Photo 05","Photo 06"].forEach((t, i) => {
+      checks += `<rect x="1212" y="${142 + i*38}" width="16" height="16" rx="3" fill="${i<4?'#3a6fd0':'#fff'}" stroke="#3a6fd0" stroke-width="2"/>
+        <text x="1240" y="${156 + i*38}" font-family="Inter, sans-serif" font-size="17" fill="#444">${t}</text>`;
+    });
+    return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1600" height="900" fill="#f1efe8"/>
+      <g transform="rotate(-13 800 450)">${blocks}</g>
+      <path d="M-50 640 C 300 560, 520 720, 900 610 S 1400 520, 1700 600" stroke="#a9c3d6" stroke-width="22" fill="none" opacity=".8"/>
+      ${dots}
+      <rect x="1180" y="46" width="330" height="360" rx="8" fill="#fff" stroke="#d6d2c8"/>
+      <text x="1206" y="90" font-family="Inter, sans-serif" font-size="20" font-weight="600" fill="#222">Photos shown</text>
+      <text x="1206" y="120" font-family="Inter, sans-serif" font-size="15" fill="#3a6fd0">Show all   Hide all</text>
+      ${checks}
+      <rect x="40" y="808" width="720" height="58" rx="8" fill="#fff" stroke="#d6d2c8"/>
+      <text x="64" y="844" font-family="Inter, sans-serif" font-size="17" fill="#444">Overlay opacity</text>
+      <line x1="210" y1="838" x2="440" y2="838" stroke="#d0ccc2" stroke-width="5" stroke-linecap="round"/>
+      <line x1="210" y1="838" x2="360" y2="838" stroke="#3a6fd0" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="360" cy="838" r="10" fill="#3a6fd0"/>
+      <text x="470" y="844" font-family="Inter, sans-serif" font-size="17" fill="#444">Base map: 1907 atlas</text>
+    </svg>`;
+  },
+
+  objects() {
+    const swatches = ["#735244","#c29682","#627a9d","#576c43","#8580b1","#67bdaa","#d67e2c","#505ba6","#c15a63","#5e3c6c","#9dbc40","#e0a32e","#383d96","#469449","#af363c","#e7c71f","#bb5695","#0885a1","#f3f3f2","#c8c8c8","#a0a0a0","#7a7a79","#555555","#343434"];
+    let cc = "";
+    swatches.forEach((c, i) => cc += `<rect x="${92 + (i%6)*46}" y="${640 + Math.floor(i/6)*46}" width="40" height="40" rx="3" fill="${c}"/>`);
+    let ticks = "";
+    for (let i = 0; i <= 40; i++) ticks += `<line x1="${1110 + i*9.5}" y1="782" x2="${1110 + i*9.5}" y2="${i%5?792:800}" stroke="#222" stroke-width="1.5"/>`;
+    return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="os" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#e2e0db"/><stop offset="1" stop-color="#8e8b85"/></radialGradient>
+        <linearGradient id="ov" x1="0" x2="1"><stop offset="0" stop-color="#3e5a6b"/><stop offset=".45" stop-color="#7d9eab"/><stop offset=".6" stop-color="#5a7b8a"/><stop offset="1" stop-color="#2c4250"/></linearGradient>
+        <linearGradient id="oj" x1="0" x2="1"><stop offset="0" stop-color="#7a4a2a"/><stop offset=".4" stop-color="#c08a5a"/><stop offset="1" stop-color="#5b341c"/></linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#os)"/>
+      <ellipse cx="800" cy="735" rx="190" ry="26" fill="#000" opacity=".22"/>
+      <path d="M740 180h120v30q-10 20 -8 60q90 70 110 190q20 150 -60 240q-20 30 -40 40h-124q-20-10 -40-40q-80-90 -60-240q20-120 110-190q2-40 -8-60z" fill="url(#ov)"/>
+      <path d="M735 470q65 22 130 0" stroke="#e8e2d0" stroke-width="5" fill="none" opacity=".7"/>
+      <path d="M720 520q80 26 160 0" stroke="#e8e2d0" stroke-width="3" fill="none" opacity=".6"/>
+      <ellipse cx="1180" cy="720" rx="90" ry="14" fill="#000" opacity=".2"/>
+      <path d="M1110 560q70-30 140 0l-10 150q-60 20 -120 0z" fill="url(#oj)"/>
+      <ellipse cx="1180" cy="560" rx="70" ry="14" fill="#4a2a16"/>
+      <rect x="80" y="628" width="286" height="196" rx="6" fill="#1b1b1b"/>
+      ${cc}
+      <rect x="1100" y="772" width="400" height="36" fill="#f3efe4" stroke="#222" stroke-width="1.5"/>
+      ${ticks}
+      <rect x="1100" y="820" width="200" height="40" fill="#fff" stroke="#bbb"/>
+      <text x="1114" y="847" font-family="Inter, sans-serif" font-size="18" fill="#333">1987.14.2</text>
+    </svg>`;
+  },
+
+  exhibit() {
+    let bars = "";
+    for (let i = 0; i < 110; i++) {
+      const h = 10 + Math.abs(Math.sin(i*0.37) * Math.cos(i*0.11)) * 90 + (i%7)*3;
+      bars += `<rect x="${140 + i*12}" y="${730 - h/2}" width="6" height="${h}" rx="3" fill="${i < 42 ? '#3a2f24' : '#b6a88f'}"/>`;
+    }
+    let years = "";
+    [1890, 1905, 1920, 1935, 1950, 1965].forEach((y, i) => {
+      const x = 140 + i*260;
+      years += `<line x1="${x}" y1="820" x2="${x}" y2="834" stroke="#6d6252" stroke-width="2"/><text x="${x}" y="860" font-family="Inter, sans-serif" font-size="18" fill="#6d6252" text-anchor="middle">${y}</text>`;
+    });
+    let lines = "";
+    for (let i = 0; i < 7; i++) lines += `<rect x="840" y="${300 + i*34}" width="${i===6?300:560 - (i%3)*40}" height="12" rx="6" fill="#bfb39c"/>`;
+    return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="es" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9c7a3"/><stop offset="1" stop-color="#8f7552"/></linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="#ece5d6"/>
+      <rect x="140" y="110" width="600" height="440" fill="#fbf8f1" transform="rotate(-2 440 330)"/>
+      <g transform="rotate(-2 440 330)">
+        <rect x="165" y="135" width="550" height="390" fill="url(#es)"/>
+        <polygon points="290,380 420,280 550,380" fill="#6a5237"/>
+        <rect x="310" y="380" width="220" height="140" fill="#7d6444"/>
+        <rect x="350" y="420" width="36" height="46" fill="#3d2f20"/><rect x="450" y="420" width="36" height="46" fill="#3d2f20"/>
+        <circle cx="610" cy="340" r="70" fill="#6b5a3e"/><circle cx="220" cy="360" r="50" fill="#735f42"/>
+        <rect x="165" y="470" width="550" height="55" fill="#6d5a3d" opacity=".6"/>
+      </g>
+      <rect x="840" y="200" width="420" height="30" rx="4" fill="#3a2f24"/>
+      <rect x="840" y="246" width="260" height="16" rx="8" fill="#9a8c72"/>
+      ${lines}
+      ${bars}
+      <circle cx="640" cy="730" r="16" fill="#F18430"/>
+      <line x1="140" y1="820" x2="1440" y2="820" stroke="#6d6252" stroke-width="2"/>
+      ${years}
+    </svg>`;
+  }
+};
+
+/* ---------- Shared helpers ---------- */
+const pad = n => String(n).padStart(2, "0");
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const mobileMQ = matchMedia("(max-width: 1024px)");
+const arrow = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10l6-6M5 4h5v5"/></svg>`;
+
+// Render an illustration with unique gradient ids, so the same artwork can
+// appear on several pages without the hidden copy breaking the visible one.
+let artSeq = 0;
+function artHTML(item, opts = {}) {
+  const fit = item.fit ? ` style="object-fit:${item.fit}"` : "";
+  if (item.video) return `<video src="${item.video}" muted loop playsinline preload="metadata" data-auto${opts.controls ? " controls" : ""}${fit}></video>`;
+  if (item.image) return `<img src="${item.image}" alt="${item.alt || item.caption || ""}" loading="lazy" draggable="false"${fit}>`;
+  const fn = ART[item.art]; if (!fn) return "";
+  const k = ++artSeq;
+  return fn().replace(/id="([\w-]+)"/g, `id="$1_${k}"`).replace(/url\(#([\w-]+)\)/g, `url(#$1_${k})`);
+}
+
+const vidIO = "IntersectionObserver" in window ? new IntersectionObserver(entries => {
+  entries.forEach(({ target: v, isIntersecting }) => {
+    v._visible = isIntersecting;
+    const slide = v.closest(".cs-slide");
+    if (isIntersecting && !v._userPaused && (!slide || slide.classList.contains("is-shown"))) v.play().catch(() => {});
+    else v.pause();
+  });
+}, { threshold: 0.25 }) : null;
+const VID_ICONS = `<svg class="i-pause" viewBox="0 0 12 12" fill="currentColor"><rect x="2.5" y="2" width="2.4" height="8"/><rect x="7.1" y="2" width="2.4" height="8"/></svg><svg class="i-play" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.8v8.4L10 6z"/></svg>`;
+// the video a container's toggle controls: the visible gallery slide, else the only video
+function activeVideo(box) {
+  return box.querySelector(".cs-slide.is-shown video") || (box.querySelector(".cs-slide") ? null : box.querySelector("video"));
+}
+function syncToggle(box) {
+  const btn = box.querySelector(":scope > .vid-toggle"); if (!btn) return;
+  const v = activeVideo(box);
+  btn.classList.toggle("has-video", !!v);
+  btn.classList.toggle("is-paused", !!v && !!v._userPaused);
+  btn.setAttribute("aria-label", v && v._userPaused ? "Play video" : "Pause video");
+}
+function addVideoToggles(root = document) {
+  root.querySelectorAll(".cs-media, .hl-item").forEach(box => {
+    if (!box.querySelector("video") || box.querySelector(":scope > .vid-toggle")) return;
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "vid-toggle"; btn.innerHTML = VID_ICONS;
+    btn.addEventListener("pointerdown", e => e.stopPropagation());
+    btn.addEventListener("click", e => {
+      e.stopPropagation(); e.preventDefault();
+      const v = activeVideo(box); if (!v) return;
+      if (v.paused) { v._userPaused = false; v.play().catch(() => {}); }
+      else { v._userPaused = true; v.pause(); }
+      syncToggle(box);
+    });
+    box.appendChild(btn);
+    syncToggle(box);
+  });
+}
+function observeVideos(root = document) {
+  addVideoToggles(root);
+  root.querySelectorAll("video[data-auto]").forEach(v => {
+    if (v._observed) return; v._observed = true;
+    if (vidIO) vidIO.observe(v); else v.play().catch(() => {});
+  });
+}
+
+/* ============================================================
+   WHEEL — the 3D carousel used on Projects and Case Studies.
+   createWheel({ root, items, prefix, cta, loop })
+   ============================================================ */
+function createWheel({ root, items, prefix, cta, loop }) {
+  const N = items.length;
+  const stage = root.querySelector(".stage");
+  const wheel = root.querySelector(".wheel");
+  const hint = root.querySelector(".hint");
+  const introEl = root.querySelector(".intro");
+  const indexEl = root.querySelector(".cs-index");
+  const mInfo = root.querySelector(".m-info");
+  const labelHTML = (p, i) => `<span class="plabel-title"><span>${prefix} ${pad(i+1)} - ${p.title}</span></span><span class="plabel-sub">${p.subtitle}</span>`;
+
+  const cards = items.map((p, i) => {
+    const a = document.createElement("a");
+    a.className = "card"; a.href = p.href; a.draggable = false;
+    a.setAttribute("aria-label", `${prefix.toLowerCase()} ${pad(i+1)}: ${p.title}`);
+    a.innerHTML = `<div class="card-inner"><div class="card-media">${artHTML(p)}</div>
+      <span class="card-cta"><span>${cta}</span>${arrow}</span></div>`;
+    wheel.appendChild(a);
+    return a;
+  });
+  const labels = items.map((p, i) => {
+    const l = document.createElement("a");
+    l.className = "plabel"; l.href = p.href; l.draggable = false;
+    l.innerHTML = labelHTML(p, i);
+    wheel.appendChild(l);
+    return l;
+  });
+  const buttons = items.map((p, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<button type="button"><b>${pad(i+1)}</b><span>${p.title}</span></button>`;
+    li.firstChild.addEventListener("click", () => goTo(i));
+    indexEl.appendChild(li);
+    return li.firstChild;
+  });
+
+  // Looping wheel (Projects) wraps around; non-looping (Case Studies) stops at the ends.
+  const wrap = loop ? d => { d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; } : d => d;
+  const idx = loop ? i => ((i % N) + N) % N : i => Math.max(0, Math.min(N - 1, i));
+  const bound = loop ? v => v : v => Math.max(0, Math.min(N - 1, v));
+
+  let pos = 0, target = 0, active = -1, W = 0, H = 0, CX = 0, CY = 0, raf = null;
+
+  function measure() {
+    if (root.hidden) return;
+    W = cards[0].offsetWidth; H = cards[0].offsetHeight;
+    CX = cards[0].offsetLeft; CY = cards[0].offsetTop;
+    if (mobileMQ.matches) {
+      hint.removeAttribute("style"); stage.style.removeProperty("--edge");
+      introEl.style.removeProperty("padding-top");
+      return;
+    }
+    // headline top = featured label top = featured image top
+    introEl.style.paddingTop = `${Math.max(24, CY - H / 2)}px`;
+    // long labels wrap rather than run into the intro column
+    const sr = stage.getBoundingClientRect();
+    const range = document.createRange();
+    let introRight = 0;
+    introEl.querySelectorAll("h1, p").forEach(n => {     // labels sit level with the headline + intro
+      range.selectNodeContents(n);
+      introRight = Math.max(introRight, range.getBoundingClientRect().right);
+    });
+    const room = Math.max(160, Math.min(270, sr.left + CX - W / 2 - 28 - introRight - 96));
+    labels.forEach(l => { l.style.maxWidth = `${room}px`; l.style.whiteSpace = "normal"; });
+    // scroll hint + "View …" inset by the same padding inside the featured image
+    const S = Math.round(Math.min(40, Math.max(20, W * 0.055)));
+    stage.style.setProperty("--edge", `${S}px`);
+    hint.style.right = `${S}px`;
+    hint.style.top = `${CY + H / 2 - S - hint.offsetHeight}px`;
+  }
+
+  // Featured card sits above centre; the card above tucks behind it and the
+  // card below is fully visible, which invites scrolling down.
+  // Cards stack in a single column at full width, like the sections on the
+  // About / detail pages: the previous card peeks in above, the next below.
+  const gapPx = () => Math.max(40, H * 0.2);
+  function layout() {
+    const step = H + gapPx();
+    cards.forEach((c, i) => {
+      const d = wrap(i - pos), ad = Math.abs(d);
+      const ty = d * step;
+      const op = ad <= 1.2 ? 1 : clamp01(1 - (ad - 1.2) * 2.5);
+      c.style.transform = `translate(-50%,-50%) translate3d(0,${ty}px,0)`;
+      c.style.opacity = op;
+      c.style.zIndex = String(100 - Math.round(ad * 10));
+      c.style.setProperty("--gray", clamp01(ad).toFixed(3));
+      c.style.setProperty("--dim", Math.min(ad * 0.34, 0.5).toFixed(3));
+      c.style.visibility = op < 0.02 ? "hidden" : "visible";
+
+      const l = labels[i];
+      const lop = ad <= 1 ? 1 - 0.1 * ad : clamp01(1 - (ad - 1) * 2);
+      l.style.transform = `translate(${CX - W / 2 - 28}px, ${CY + ty - H / 2}px) translate(-100%, 0)`;
+      l.style.opacity = lop;
+      l.style.visibility = lop < 0.02 ? "hidden" : "visible";
+      l.style.pointerEvents = lop < 0.3 ? "none" : "auto";
+    });
+  }
+
+
+  function tick() {
+    const diff = target - pos;
+    pos = reduceMotion || Math.abs(diff) < 0.0008 ? target : pos + diff * 0.11;
+    layout();
+    raf = pos !== target ? requestAnimationFrame(tick) : null;
+  }
+  const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+
+  function setActive(i) {
+    if (i === active) return;
+    active = i;
+    cards.forEach((c, k) => { c.classList.toggle("is-active", k === i); c.tabIndex = k === i ? 0 : -1; });
+    labels.forEach((l, k) => { l.tabIndex = k === i ? 0 : -1; l.classList.toggle("is-current", k === i); });
+    buttons.forEach((b, k) => b.classList.toggle("is-current", k === i));
+    mInfo.innerHTML = labelHTML(items[i], i);
+    mInfo.href = items[i].href;
+  }
+  const hideHint = () => hint.classList.add("is-hidden");
+  function goTo(i) {
+    target = loop ? target + wrap(i - idx(Math.round(target))) : bound(i);
+    setActive(idx(Math.round(target))); hideHint(); kick();
+  }
+  function step(dir) { target = bound(Math.round(target) + dir); setActive(idx(target)); hideHint(); kick(); }
+
+  // wheel / trackpad: one item per gesture
+  let acc = 0, lock = false, idle;
+  stage.addEventListener("wheel", e => {
+    e.preventDefault();
+    acc += Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    clearTimeout(idle);
+    idle = setTimeout(() => { acc = 0; lock = false; }, 160);
+    if (!lock && Math.abs(acc) > 35) {
+      step(Math.sign(acc)); acc = 0; lock = true;
+      setTimeout(() => { lock = false; }, 420);
+    }
+  }, { passive: false });
+
+  // drag / swipe (pointer is only captured once it's really a drag, so clicks still work)
+  let dragging = false, startY = 0, startT = 0, moved = 0, lastY = 0, lastTime = 0, vel = 0;
+  stage.addEventListener("pointerdown", e => {
+    if (e.button !== undefined && e.button !== 0) return;
+    dragging = true; moved = 0;
+    startY = lastY = e.clientY; startT = target; lastTime = performance.now(); vel = 0;
+  });
+  stage.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    const dy = e.clientY - startY;
+    moved = Math.max(moved, Math.abs(dy));
+    if (moved <= 5) return;
+    if (!stage.classList.contains("is-dragging")) {
+      stage.classList.add("is-dragging");
+      try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+    const now = performance.now();
+    vel = (e.clientY - lastY) / Math.max(1, now - lastTime);
+    lastY = e.clientY; lastTime = now;
+    target = bound(startT - dy / (H + gapPx()));
+    setActive(idx(Math.round(target))); kick();
+  });
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false; stage.classList.remove("is-dragging");
+    const fling = Math.abs(vel) > 0.5 ? -Math.sign(vel) * 0.5 : 0;
+    target = bound(Math.round(target + fling));
+    setActive(idx(target));
+    if (moved > 5) hideHint();
+    kick();
+  }
+  stage.addEventListener("pointerup", endDrag);
+  stage.addEventListener("pointercancel", endDrag);
+
+  // clicking a card or label above/below makes it the featured one
+  [...cards, ...labels].forEach((c, j) => c.addEventListener("click", e => {
+    const i = j % N;
+    if (moved > 5) { e.preventDefault(); return; }
+    if (i !== active) { e.preventDefault(); goTo(i); }
+  }));
+  stage.addEventListener("keydown", e => {
+    if (["ArrowDown", "ArrowRight", "PageDown"].includes(e.key)) { e.preventDefault(); step(1); }
+    if (["ArrowUp", "ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); step(-1); }
+  });
+  hint.addEventListener("click", () => step(1));
+
+  setActive(0);
+  return {
+    refresh() { measure(); layout(); },
+    enter() {                       // small settle-in when the page appears
+      measure();
+      pos = target - 0.35;
+      layout(); kick();
+    }
+  };
+}
+
+/* ---------- Nav dropdowns (tap support) ---------- */
+document.querySelectorAll(".nav-item").forEach(item => {
+  const btn = item.querySelector(".nav-trigger");
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const open = !item.classList.contains("is-open");
+    document.querySelectorAll(".nav-item.is-open").forEach(o => { o.classList.remove("is-open"); o.querySelector(".nav-trigger").setAttribute("aria-expanded", "false"); });
+    item.classList.toggle("is-open", open);
+    btn.setAttribute("aria-expanded", String(open));
+  });
+});
+document.addEventListener("click", () => document.querySelectorAll(".nav-item.is-open").forEach(o => { o.classList.remove("is-open"); o.querySelector(".nav-trigger").setAttribute("aria-expanded", "false"); }));
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.body.click(); });
+
+
+/* ============================================================
+   CASE STUDIES — edit this array. Set `image` to use a real
+   screenshot instead of the illustrated placeholder.
+   ============================================================ */
+const CASES = [
+  {
+    title: "From Historic Space to Interactive 3D Experience",
+    subtitle: "3D Digitization Workflow",
+    summary: "A Gaussian splatting scan of a historic hearth, turned into an interactive 3D model that visitors can explore on a website from anywhere.",
+    meta: [["Role", "3D scanning, post production, website development, workflow design"], ["Context", "Montclair History Center"], ["Tools", "DSLR camera, Postshot, SuperSplat, Claude"]],
+    href: "#case-study-01", image: "media/case1_context1.jpg", art: "hearth"
+  },
+  {
+    title: "Designing Accessible, Multisensory Museum Experiences",
+    subtitle: "Exhibition Development",
+    summary: "A multisensory exhibition with accessibility design for the Pharmacy Room at Intrepid Museum's Sick Bay.",
+    meta: [["Role", "Exhibition design, UX design, research, project coordination"], ["Context", "Intrepid Museum, NYU Ability Project"], ["Tools", "Figma"]],
+    href: "#case-study-02", image: "media/case2_process1.png", art: "csProcess"
+  }
+];
+
+ART.csStudio = () => {
+  let thumbs = "";
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) {
+    const tones = ["#b99a74","#8d7a63","#c9b89a","#6f604f","#a58a6a","#d4c4a8"];
+    thumbs += `<rect x="${1090 + c*96}" y="${330 + r*80}" width="84" height="68" fill="${tones[(r*4+c)%6]}"/>`;
+  }
+  return `<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="csa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8d4cc"/><stop offset="1" stop-color="#a9a399"/></linearGradient>
+      <radialGradient id="csl" cx=".35" cy=".35" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="1600" height="1000" fill="url(#csa)"/>
+    <rect y="640" width="1600" height="360" fill="#7a6a58"/>
+    <rect x="530" y="0" width="22" height="660" fill="#2c2c2c"/>
+    <rect x="420" y="170" width="260" height="46" rx="6" fill="#2c2c2c"/>
+    <rect x="470" y="216" width="150" height="110" rx="12" fill="#1c1c1c"/>
+    <circle cx="545" cy="340" r="44" fill="#111"/><circle cx="545" cy="340" r="26" fill="#2d3a48"/>
+    <polygon points="170,110 330,110 380,300 120,300" fill="#e9e6df"/>
+    <polygon points="760,110 920,110 970,300 710,300" fill="#e9e6df"/>
+    <rect x="230" y="620" width="620" height="120" fill="#efe9dc" transform="skewX(-18)"/>
+    <rect x="380" y="560" width="330" height="200" fill="#f6efdd" transform="skewX(-18)"/>
+    <rect x="410" y="585" width="200" height="12" fill="#b9a988" transform="skewX(-18)"/>
+    <rect x="410" y="612" width="260" height="10" fill="#cfc2a4" transform="skewX(-18)"/>
+    <rect x="410" y="636" width="230" height="10" fill="#cfc2a4" transform="skewX(-18)"/>
+    <g transform="skewX(-18)">${[0,1,2,3,4,5].map(i=>`<rect x="${760+i*22}" y="700" width="20" height="20" fill="${["#735244","#c29682","#627a9d","#576c43","#d67e2c","#f3f3f2"][i]}"/>`).join("")}</g>
+    <rect x="1050" y="260" width="460" height="330" rx="10" fill="#1d1d1b"/>
+    <rect x="1070" y="280" width="420" height="30" fill="#2e2e2c"/>
+    ${thumbs}
+    <rect x="1020" y="590" width="520" height="22" rx="6" fill="#3a3a38"/>
+    <rect width="1600" height="1000" fill="url(#csl)"/>
+  </svg>`;
+};
+
+ART.csProcess = () => {
+  let grid = "";
+  for (let x = 0; x <= 1600; x += 40) grid += `<line x1="${x}" y1="0" x2="${x}" y2="1000" stroke="#c9d3dd" stroke-width="1"/>`;
+  for (let y = 0; y <= 1000; y += 40) grid += `<line x1="0" y1="${y}" x2="1600" y2="${y}" stroke="#c9d3dd" stroke-width="1"/>`;
+  const note = (x, y, c, r) => `<g transform="rotate(${r} ${x+70} ${y+70})"><rect x="${x}" y="${y}" width="140" height="140" fill="${c}"/><rect x="${x+18}" y="${y+30}" width="96" height="9" rx="4" fill="#00000030"/><rect x="${x+18}" y="${y+54}" width="76" height="9" rx="4" fill="#00000030"/><rect x="${x+18}" y="${y+78}" width="86" height="9" rx="4" fill="#00000030"/></g>`;
+  return `<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1600" height="1000" fill="#f3f1ea"/>
+    ${grid}
+    <g transform="rotate(-3 460 500)">
+      <rect x="140" y="170" width="620" height="440" fill="#fffdf7" stroke="#9a9588" stroke-width="3"/>
+      <rect x="170" y="200" width="380" height="380" fill="none" stroke="#6a665c" stroke-width="3" stroke-dasharray="10 8"/>
+      <path d="M190 520 L300 330 L420 420 L530 250" fill="none" stroke="#6a665c" stroke-width="4"/>
+      <circle cx="300" cy="330" r="12" fill="#F18430"/><circle cx="420" cy="420" r="12" fill="#F18430"/>
+      <rect x="580" y="200" width="150" height="24" fill="#6a665c"/><rect x="580" y="240" width="130" height="12" fill="#b3ad9f"/>
+      <rect x="580" y="265" width="140" height="12" fill="#b3ad9f"/><rect x="580" y="310" width="150" height="90" fill="none" stroke="#6a665c" stroke-width="3"/>
+    </g>
+    ${note(820, 150, "#f6d77a", 4)}${note(990, 180, "#f2b8a0", -5)}${note(860, 340, "#bfe0c9", -2)}${note(1030, 360, "#f6d77a", 6)}
+    <rect x="1230" y="260" width="250" height="500" rx="34" fill="#1d1d1b"/>
+    <rect x="1246" y="300" width="218" height="420" rx="6" fill="#e7dfcf"/>
+    <g opacity=".7">${[0,1,2,3,4].map(i=>`<line x1="1246" y1="${330+i*80}" x2="1464" y2="${300+i*80}" stroke="#fff" stroke-width="10"/>`).join("")}</g>
+    <circle cx="1320" cy="420" r="10" fill="#3a6fd0"/><circle cx="1400" cy="520" r="10" fill="#3a6fd0"/><circle cx="1350" cy="600" r="10" fill="#3a6fd0"/>
+    <rect x="1262" y="640" width="186" height="60" rx="6" fill="#fff"/>
+    <path d="M760 700 C 900 820, 1080 820, 1210 640" fill="none" stroke="#8a8578" stroke-width="3" stroke-dasharray="8 8"/>
+  </svg>`;
+};
+
+ART.catalog = () => {
+  let cards = "";
+  const tones = ["#b99a74","#7d8b95","#c9b89a","#6f604f","#9aa38a","#d4c4a8"];
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+    const x = 180 + c * 430, y = 120 + r * 280, k = r * 3 + c;
+    cards += `<g transform="rotate(${(k % 3 - 1) * 1.2} ${x+190} ${y+110})">
+      <rect x="${x}" y="${y}" width="380" height="230" fill="#fbf9f4" stroke="#d9d3c5" stroke-width="2"/>
+      <rect x="${x+20}" y="${y+20}" width="130" height="130" fill="${tones[k % 6]}"/>
+      <rect x="${x+170}" y="${y+26}" width="170" height="14" fill="#4a453c"/>
+      <rect x="${x+170}" y="${y+56}" width="150" height="9" fill="#b8b0a0"/>
+      <rect x="${x+170}" y="${y+76}" width="165" height="9" fill="#b8b0a0"/>
+      <rect x="${x+170}" y="${y+96}" width="120" height="9" fill="#b8b0a0"/>
+      <rect x="${x+20}" y="${y+170}" width="90" height="26" fill="none" stroke="#F18430" stroke-width="2"/>
+    </g>`;
+  }
+  return `<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1600" height="1000" fill="#ebe7de"/>${cards}</svg>`;
+};
+
+/* ---------- Extra placeholder illustrations for case study sections ---------- */
+ART.goals = () => {
+  const rows = [0,1,2,3].map(i => `
+    <rect x="560" y="${250 + i*130}" width="46" height="46" fill="none" stroke="#4a453c" stroke-width="4"/>
+    ${i < 3 ? `<path d="M570 ${273 + i*130} l12 12 l22 -26" fill="none" stroke="#F18430" stroke-width="6"/>` : ""}
+    <rect x="640" y="${258 + i*130}" width="${[420,360,460,300][i]}" height="16" fill="#4a453c"/>
+    <rect x="640" y="${286 + i*130}" width="${[300,340,260,280][i]}" height="10" fill="#b8b0a0"/>`).join("");
+  return `<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1600" height="1000" fill="#e6e2d8"/>
+    <rect x="480" y="150" width="700" height="720" fill="#fbf9f4" transform="rotate(-1.5 830 510)"/>
+    <g transform="rotate(-1.5 830 510)">${rows}</g></svg>`;
+};
+ART.archiveUI = () => {
+  const tones = ["#b99a74","#7d8b95","#c9b89a","#6f604f","#9aa38a","#d4c4a8","#8d7a63","#a58a6a"];
+  let grid = "";
+  for (let i = 0; i < 8; i++) {
+    const x = 330 + (i % 4) * 250, y = 400 + Math.floor(i / 4) * 250;
+    grid += `<rect x="${x}" y="${y}" width="220" height="160" fill="${tones[i]}"/><rect x="${x}" y="${y+176}" width="${140 + (i%3)*25}" height="12" fill="#4a453c"/><rect x="${x}" y="${y+198}" width="100" height="9" fill="#b8b0a0"/>`;
+  }
+  return `<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1600" height="1000" fill="#d9d5cc"/>
+    <rect x="250" y="120" width="1100" height="880" fill="#fbf9f4"/>
+    <rect x="250" y="120" width="1100" height="60" fill="#ece8df"/>
+    <circle cx="285" cy="150" r="8" fill="#c9c2b3"/><circle cx="312" cy="150" r="8" fill="#c9c2b3"/><circle cx="339" cy="150" r="8" fill="#c9c2b3"/>
+    <rect x="330" y="230" width="600" height="56" fill="#fff" stroke="#cfc8b8" stroke-width="2"/>
+    <rect x="352" y="252" width="200" height="12" fill="#b8b0a0"/>
+    <rect x="950" y="230" width="140" height="56" fill="#F18430"/>
+    <rect x="330" y="320" width="90" height="30" fill="none" stroke="#4a453c" stroke-width="2"/>
+    <rect x="435" y="320" width="120" height="30" fill="none" stroke="#b8b0a0" stroke-width="2"/>
+    <rect x="570" y="320" width="100" height="30" fill="none" stroke="#b8b0a0" stroke-width="2"/>
+    ${grid}</svg>`;
+};
+// Orange annotation callouts over another illustration
+const withCallouts = base => () => ART[base]().replace(/<\/svg>\s*$/, `
+    <g fill="none" stroke="#F18430" stroke-width="5">
+      <circle cx="560" cy="300" r="70"/><circle cx="1150" cy="560" r="90"/><circle cx="820" cy="760" r="60"/>
+    </g>
+    <g font-family="Inter, sans-serif" font-size="30" font-weight="600" fill="#fff">
+      <circle cx="610" cy="245" r="24" fill="#F18430" stroke="none"/><text x="600" y="256">1</text>
+      <circle cx="1210" cy="490" r="24" fill="#F18430" stroke="none"/><text x="1200" y="501">2</text>
+      <circle cx="865" cy="710" r="24" fill="#F18430" stroke="none"/><text x="855" y="721">3</text>
+    </g></svg>`);
+ART.archiveNotes = withCallouts("archiveUI");
+ART.mapNotes = withCallouts("map");
+ART.outcome = () => {
+  const bars = [0.35, 0.5, 0.62, 0.78, 0.92].map((h, i) =>
+    `<rect x="${330 + i*130}" y="${760 - h*460}" width="84" height="${h*460}" fill="${i === 4 ? "#F18430" : "#8d8577"}"/>`).join("");
+  return `<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1600" height="1000" fill="#ebe7de"/>
+    <line x1="300" y1="760" x2="1000" y2="760" stroke="#4a453c" stroke-width="3"/>${bars}
+    <rect x="1070" y="300" width="360" height="300" fill="#fbf9f4"/>
+    <text x="1100" y="390" font-family="Georgia, serif" font-size="90" fill="#F18430">“</text>
+    <rect x="1100" y="420" width="290" height="14" fill="#4a453c"/><rect x="1100" y="452" width="250" height="14" fill="#4a453c"/>
+    <rect x="1100" y="484" width="270" height="14" fill="#4a453c"/><rect x="1100" y="540" width="140" height="10" fill="#b8b0a0"/></svg>`;
+};
+
+/* ============================================================
+   CASE STUDY DETAIL PAGES — one entry per case study, same order
+   as CASES. Every case study uses the same seven sections.
+   Replace the placeholder text; set `image` for real photos.
+   ============================================================ */
+const SECTION_NAMES = ["Context", "Goals", "Research", "Creative Process", "Highlights", "Project Page", "Outcome", "Reflection"];
+// A section can show several images: give it `images: [{ image: "img/a.jpg" }, { image: "img/b.jpg" }]`
+// (or `art` names for the placeholders). One image → no prev/next buttons.
+const CASE_DETAILS = [
+  [ // 01 From Historic Space to Interactive 3D Experience
+    { images: [{ image: "media/case1_context1.jpg" }],
+      text: "The historic hearth at the Montclair History Center is part of the site's material history, but its physical location and form can limit how visitors explore it. This project experimented with 3D technology as a way to digitally preserve the space while creating a more interactive way for audiences to encounter its history." },
+    { text: "The goal was to create an accessible digital experience that combines 3D documentation with historical interpretation. Rather than presenting the hearth as a static photograph, I wanted audiences to explore the space themselves while learning about its historical context." },
+    { text: "I researched the hearth's physical and historical context to determine which details would be most meaningful to highlight in the digital experience. I also explored 3D Gaussian splatting as a method for capturing complex architectural spaces and considered how resolution, navigation, and device performance would affect accessibility." },
+    { images: [
+        { image: "media/case1_process1.png", fit: "contain", caption: "Raw footage captured on-site (partial)." },
+        { image: "media/case1_process2.png", fit: "contain", caption: "Scan processed in Postshot." },
+        { image: "media/case1_process3.png", fit: "contain", caption: "Scan cleaned in SuperSplat (full view outside the building)." },
+        { image: "media/case1_process4.png", fit: "contain", caption: "Cleaning extra splats to optimize file size." },
+        { image: "media/case1_process5.png", fit: "contain", caption: "Recording camera positions for story nodes with the calibration tool." },
+        { image: "media/case1_process6.png", fit: "contain", caption: "Brainstormed the interactive experience." } ],
+      text: "I captured the hearth on-site using a Nikon D850 and processed the footage (900+ images) into a 3D Gaussian splat using Postshot. I then cleaned the scan in SuperSplat to make sure the file size was optimized for various devices. I then consulted about the historic context and brainstormed the website experience around seven story nodes, using camera positioning and scrolling to guide audiences through different areas of the model while connecting each view to interpretive text." },
+    { text: `The final experience combines an interactive 3D model with scroll-based storytelling, allowing users to orbit, navigate, and zoom into the hearth from different perspectives. I also developed a camera calibration tool and incorporated responsive controls so the experience could be accessed across desktop and mobile devices. (View more on the project page <a class="text-link" href="#project-01">here</a>.)` },
+    { kind: "link", projectIndex: 0 },   // Project Page → Project 01
+    { text: "The project resulted in a publicly accessible website featuring the interactive 3D model, seven interpretive story nodes, and supporting historical content. It demonstrates how emerging 3D technologies can extend the experience of a physical historic site beyond the museum itself. I also prepared a project documentation file detailing the goals, context, workflows, and technical specifications to support future maintenance and sustainable development." },
+    { text: "This project helped me understand both the possibilities and limitations of using Gaussian splatting for cultural heritage interpretation. The model still contains artifacts such as surface gaps and feathered edges, but the process showed me how 3D capture, interpretation, and web design can work together to make physical heritage more accessible and explorable." }
+  ],
+  [ // 02 Designing Accessible, Multisensory Museum Experiences
+    { images: [{ image: "media/case2_context1.png" }],
+      text: "The Intrepid Museum's Pharmacy is a small, narrow historic space that tells the story of medicine and pharmaceutical compounding aboard the ship. Our team explored how interactive and multisensory interpretation could help visitors better understand the space, its tools, and the process of making medicine." },
+    { text: "We wanted visitors to understand how medicines were compounded, how supplies were stored and prepared, and how pharmacy practices aboard Intrepid connected to their experiences with medication today. The experience also aimed to let visitors engage directly with tools, recipes, and techniques through interactive and multisensory activities." },
+    { text: "We examined the physical constraints of the Pharmacy, including its narrow footprint, limited viewing area, sound bleed, and material durability. We also considered accessibility from the beginning, asking how touch, sound, scent, and digital interaction could provide multiple ways to access the same content." },
+    { images: [
+        { image: "media/case2_process1.png", fit: "contain", caption: "How the interactive experiences work together on a floor plan." },
+        { image: "media/case2_process2.png", fit: "contain", caption: "Feedback on initial ideation." },
+        { image: "media/case2_process3.png", fit: "contain", caption: "Sitemap of the interactive touch screen." },
+        { image: "media/case2_process4.png", fit: "contain", caption: "Low-fidelity prototype of the interactive touch screen." } ],
+      text: "We developed ideas through three rounds of brainstorming, combining interactive concepts with additional sensory elements and refining them through feedback. The process evolved into three connected components: an interactive recipe-making touchscreen, scent bottles, and tactile drawers, supported by accessible labels and directions. The development of the interactive touchscreen includes a sitemap, a low-fidelity prototype, and a high-fidelity prototype." },
+    { text: `I contributed to developing the interactive recipe-making experience and its high-fidelity prototype, where visitors follow a historical pharmacy recipe through a drag-and-drop mixing activity. I also worked on accessibility features including screen-reader compatibility, audio description, haptic feedback, tactile overlays, Braille, and large-print materials. (View more on the project page <a class="text-link" href="#project-04">here</a>.)` },
+    { kind: "link", projectIndex: 3 },   // Project Page → Project 04
+    { text: "The project resulted in low- and high-fidelity prototypes for the touchscreen experience, scent-based interaction, labels, and physical components. Rather than treating accessibility as an add-on, the proposed experience incorporated multiple modes of interaction—including visual, tactile, auditory, and olfactory elements—throughout the design." },
+    { text: "This project showed me that accessible interpretation is not simply about adding accommodations to an existing experience. Instead, it involves considering people with various needs and preferences from the beginning. Designing for a small historic space also pushed me to think about how physical constraints, sensory interaction, digital interfaces, and accessibility can work together to create a more inclusive museum experience." }
+  ]
+];
+
+/* Zoomed-in crops of the placeholder illustrations, for highlight galleries */
+const crop = (base, vb) => () => ART[base]().replace(/viewBox="[^"]+"/, `viewBox="${vb}"`);
+ART.hearthMantel = crop("hearth", "300 220 820 460");
+ART.hearthWindow = crop("hearth", "1150 300 420 320");
+ART.hearthFire   = crop("hearth", "430 540 520 360");
+ART.hearthHerbs  = crop("hearth", "480 200 560 320");
+ART.mapPanel     = crop("map", "1150 30 400 400");
+ART.mapStreets   = crop("map", "200 200 600 450");
+ART.objectsVase  = crop("objects", "560 140 480 640");
+ART.objectsChart = crop("objects", "60 600 330 240");
+ART.exhibitPhoto = crop("exhibit", "120 90 640 480");
+ART.exhibitWave  = crop("exhibit", "120 620 820 280");
+
+/* ============================================================
+   PROJECT DETAIL PAGES — same order as PROJECTS.
+   Sections: Overview (text) · Demo (image/s + text) ·
+   Highlights (2-column gallery, caption on hover) ·
+   Case Study (only if caseStudy is set to a CASES index).
+   ============================================================ */
+const PROJECT_DETAILS = [
+  { // 01 3D-scanned Hearth
+    summary: "A Gaussian splatting scan of a historic hearth, turned into an interactive 3D model that visitors can explore on a website from anywhere.",
+    meta: [["Role", "3D scanning, post production, website development, workflow design"], ["Context", "Montclair History Center"], ["Tools", "DSLR camera, Postshot, SuperSplat, Claude"]],
+    overview: { text: ["The 3D-scanned Hearth uses 3D Gaussian splatting to digitally capture the historic hearth and resulted in a website featuring an interactive 3D model and interpretive text. Audiences can explore the 3D model while learning about the history and context of the hearth. The goal was to make local history more interactive and accessible to the public."] },
+    demo: { images: [{ video: "media/project1_demo1.mp4" }],
+      text: "Scroll the page for a guided tour, or use the controls to explore the 3D model at your wish.", link: "https://3d-scanned-hearth.montclairhistory.org/" },
+    highlights: { items: [
+      { image: "media/project1_highlight1.png", caption: "Split-screens, text on the left and the 3D model on the right." },
+      { video: "media/project1_highlight2.mp4", caption: "Scrolling between text sections will anchor/re-anchor camera views." },
+      { image: "media/project1_highlight3.png", caption: "A close-up of the 3D-scanned hearth." },
+      { image: "media/project1_highlight4.png", caption: "A control panel about navigation and allows the audience to select the graphics quality as they wish." } ] },
+    caseStudy: 0
+  },
+  { // 02 Montclair Historic Map
+    summary: "An interactive website map layering historic atlases, photographs, and stories over today's streets.",
+    meta: [["Role", "Georeferencing, website development, research, workflow design"], ["Context", "Montclair History Center"], ["Tools", "Map Warper, Claude"]],
+    overview: { text: ["The interactive Montclair Historic Map uses georeferencing to align a historic 1906 atlas of Montclair with a modern map, resulting in a website featuring the overlaid historic map and interpretive drop pins. Audiences can adjust the transparency of the historic map overlay, toggle individual map plates on or off, and explore additional information through the drop pins. Admins can edit existing drop pins or add new ones. The goal was to make local history more interactive and accessible to the public."] },
+    demo: { images: [{ video: "media/project2_demo1.mp4" }, { video: "media/project2_demo2.mp4" }],
+      text: "Use control panels to adjust historic plates and overlay. Click on drop pins to view more. Admins can edit/add drop pins.", link: "https://interactive-1906-montclair-map.montclairhistory.org/" },
+    highlights: { items: [
+      { video: "media/project2_highlight1.mp4", caption: "Interacting with the map involves intuitive dragging." },
+      { video: "media/project2_highlight2.mp4", caption: "The slider can adjust the opacity of the historic map overlay." },
+      { image: "media/project2_highlight3.png", caption: "Clicking on a drop pin will show a detailed introduction, link, and image of the location." },
+      { image: "media/project2_highlight4.png", caption: "When logged in as admin, drop pins can be modified." } ] },
+    caseStudy: null
+  },
+  { // 03 Buddha Dipankara
+    summary: "A multisensory installation with physical and digital elements showcasing representative cultural artifacts of four regions along the Silk Road.",
+    meta: [["Role", "Exhibition design, 3D scanning, post production, research, project management"], ["Context", "B.S. Senior Project, NYU Integrated Design and Media"], ["Tools", "DSLR camera, RealityScan, Blender"]],
+    overview: { text: ["Buddha Dipankara (Dingguang) from Northern Wei dynasty (386–534), on view at The MET, was 3D-scanned with photogrammetry and rendered into a video with point cloud animation, as part of the Interactive Silk Road project."] },
+    demo: { images: [{ video: "media/project3_demo1.mp4" }],
+      text: `View entire project presentation <a class="text-link" href="https://drive.google.com/file/d/1a925enCNAt6Uz5VACmHjJpNxgQV055oT/view?usp=sharing" target="_blank" rel="noopener">here</a>. Visit <a class="text-link" href="https://sketchfab.com/3d-models/buddha-dipankara-01364689bc554d149418152e339e5024" target="_blank" rel="noopener">here</a> to interact with the 3D model on Sketchfab.`, link: "https://sketchfab.com/3d-models/buddha-dipankara-01364689bc554d149418152e339e5024" },
+    highlights: { items: [
+      { image: "media/project3_highlight1.png", caption: "Left-front 3/4 view of the 3D model's rendered detail." },
+      { image: "media/project3_highlight2.png", caption: "Right-back 3/4 view of the 3D model's rendered detail." },
+      { image: "media/project3_highlight3.gif", caption: "Dissolve effect in the rendered video." },
+      { image: "media/project3_highlight4.jpg", caption: "The entire Interactive Silk Road installation." } ] },
+    caseStudy: null
+  },
+  { // 04 Pharmacy Compounding Lab
+    summary: "A multisensory exhibition with accessibility design for the Pharmacy Room at Intrepid Museum's Sick Bay.",
+    meta: [["Role", "Exhibition design, UX design, research, project coordination"], ["Context", "Intrepid Museum, NYU Ability Project"], ["Tools", "Figma"]],
+    overview: { text: ["Pharmacy Compounding Lab is an interactive touch screen experience as part of the Pharmacy Room at Intrepid Museum project, a collaborative project designing an accessible and interactive visitor experience. The entire experience consists of an interactive touch screen, scent bottles, tactile drawers, and labels and directives."] },
+    demo: { images: [{ video: "media/project4_demo1.mp4" }],
+      text: `View entire project presentation <a class="text-link" href="https://drive.google.com/file/d/1h3a4tucMJUR_Y4hCu9Sn5L_VBHNoyMuX/view?usp=sharing" target="_blank" rel="noopener">here</a>. Visit <a class="text-link" href="https://www.figma.com/proto/w1bJnrbNIW5Rrc7QGsLpii/Activity-1--Make-a-recipe--reader-rail-?node-id=80-455&amp;p=f&amp;t=5FhUCBrVdsfH4WVO-1&amp;scaling=scale-down&amp;content-scaling=fixed&amp;page-id=79%3A34&amp;starting-point-node-id=80%3A455" target="_blank" rel="noopener">here</a> to interact with the touch screen on Figma. Visit <a class="text-link" href="https://sketchfab.com/3d-models/pharmacy-scent-demo-698f9f8a1a71485abd2adeaba1315a06" target="_blank" rel="noopener">here</a> to interact with the scent bottles on Sketchfab.`, link: "https://www.figma.com/proto/w1bJnrbNIW5Rrc7QGsLpii/Activity-1--Make-a-recipe--reader-rail-?node-id=80-455&amp;p=f&amp;t=5FhUCBrVdsfH4WVO-1&amp;scaling=scale-down&amp;content-scaling=fixed&amp;page-id=79%3A34&amp;starting-point-node-id=80%3A455" },
+    highlights: { items: [
+      { image: "media/project4_highlight1.png", caption: "Landing page of Pharmacy Compounding Lab." },
+      { image: "media/project4_highlight2.png", caption: "Choose-your-recipe page of Pharmacy Compounding Lab." },
+      { image: "media/project4_highlight3.png", caption: "Close-up of a recipe." },
+      { image: "media/project4_highlight4.png", caption: "Close-up of the compounding process." } ] },
+    caseStudy: 1
+  }
+];
+
+ART.portrait = () => `<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="pb" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#e9e3d6"/><stop offset="1" stop-color="#b9b0a0"/></radialGradient>
+    <linearGradient id="pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a4a3b"/><stop offset="1" stop-color="#3a2f25"/></linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#pb)"/>
+  <rect x="1060" y="150" width="300" height="380" fill="#d8cfbe"/><rect x="1085" y="175" width="250" height="330" fill="#a79a84"/>
+  <circle cx="700" cy="420" r="150" fill="url(#pf)"/>
+  <path d="M430 1000 C 440 760, 560 640, 700 640 S 960 760, 970 1000 Z" fill="url(#pf)"/>
+  <g transform="translate(1240 760)"><rect width="90" height="90" fill="none" stroke="#F18430" stroke-width="7"/><rect x="11" y="11" width="68" height="68" fill="none" stroke="#F18430" stroke-width="2.5"/></g>
+</svg>`;
+ART.gallery = () => {
+  const frames = [[180,200,300,380,"#8d7a63"],[560,260,420,280,"#b99a74"],[1060,180,260,340,"#7d8b95"],[1400,240,160,220,"#c9b89a"]]
+    .map(([x,y,w,h,c]) => `<rect x="${x-14}" y="${y-14}" width="${w+28}" height="${h+28}" fill="#fbf9f4"/><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`).join("");
+  return `<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1600" height="1000" fill="#efebe3"/><rect y="760" width="1600" height="240" fill="#c7bba7"/>${frames}
+    <ellipse cx="760" cy="880" rx="60" ry="14" fill="#000" opacity=".15"/><rect x="735" y="660" width="50" height="220" rx="24" fill="#4a453c"/><circle cx="760" cy="630" r="34" fill="#4a453c"/>
+  </svg>`;
+};
+
+/* ============================================================
+   ABOUT PAGE — edit freely. Uses the same detail-page template.
+   ============================================================ */
+const ABOUT = {
+  kicker: "About",
+  title: "About",
+  summary: "I'm Evaine Sun /iːˈveɪn sʌn/, a designer and developer working in digital interpretation for cultural heritage and education, based in New York City.",
+  meta: [],
+  sections: [
+    { name: "Bio", kind: "media", images: [{ image: "media/bio.png" }],
+      text: ["I create digital experiences that help people connect with culture, history, and place: 3D digitization, interactive websites, and digital exhibitions.",
+             "I'm interested in creative experiences between physical and digital spaces. My work brings together research, design, and technology with a focus on interpretation: making cultural heritage more accessible, engaging, and meaningful to people."] },
+    { name: "Experience", kind: "list", rows: [
+      { title: "Rubin Museum of Himalayan Art", org: "Editorial and Digital Content Intern", when: "09/2026 – present",
+        text: "Contribute to digital interpretation and content initiatives related to Himalayan art and cultural heritage, supporting the development and presentation of museum content across digital platforms." },
+      { title: "Montclair History Center", org: "Intern; 3D digitization, social media, administrative assistance", when: "05/2026 – 08/2026",
+        text: "Developed independent digital interpretation projects, including 3D digitization and interactive web experiences, while supporting signage, research, and museum operations." },
+      { title: "NYU Tandon Polytechnic Tutoring Center", org: "Front Desk Aide", when: "09/2024 – 05/2026",
+        text: "Served as a primary point of contact for students and visitors, providing professional customer service and supporting the daily operations of the Polytechnic Tutoring Center." },
+      { title: "NYU Shanghai Summer Immersion Program", org: "Program Assistant", when: "05/2025 – 08/2025",
+        text: "Planned and coordinated weekly cultural, social, and language immersion activities and excursions for international students, supporting event logistics and student engagement." },
+      { title: "Tianzige NGO", org: "Intern; website development, graphic design", when: "09/2023 – 12/2023",
+        text: "Implemented website revision and created digital and print communications, including posters and brochures, for an education-focused nonprofit." } ] },
+    { name: "Education", kind: "list", rows: [
+      { title: "New York University, Tandon School of Engineering", org: "Integrated Design & Media", when: "M.S. & B.S., 2021 – 2026",
+        text: "Integrated master's and bachelor's degrees, focused on digital cultural heritage, minored in Anthropology." } ] },
+    { name: "Skills & Tools", kind: "cols", cols: [
+      { title: "Digital & Design", items: ["3D digitization & scanning", "Exhibition & experience design", "Digital asset & website content management", "Multimedia production", "Digital marketing & social media", "Prototyping & installation"] },
+      { title: "Miscellaneous", items: ["Project management & documentation", "Event management & logistics", "Workflow development", "Cross-department coordination"] } ] },
+    { name: "Beyond Work", kind: "media", images: [{ image: "media/beyond_work.jpg" }],
+      text: `Outside of work, you'll find me traveling around the world and developing personal projects of other topics and mediums. View my photo gallery <a class="text-link" href="#photo-gallery">here</a> and blogs <a class="text-link" href="#blogs">here</a>.` },
+    { name: "Contact", kind: "text",
+      text: "I'm always happy to talk about cultural heritage, creative projects, and new collaborations.",
+      html: `<div class="link-row">
+        <a class="text-link" href="mailto:evainesun@gmail.com">Email</a>
+        <a class="text-link" href="https://www.linkedin.com/in/evainesun/" target="_blank" rel="noopener">LinkedIn</a></div>` }
+  ]
+};
+function renderAbout() {
+  renderDetail({
+    key: "about", main: true, kicker: ABOUT.kicker, title: ABOUT.title, summary: ABOUT.summary, meta: ABOUT.meta,
+    back: null, sections: ABOUT.sections,
+    next: { kicker: "Next", label: "PROJECTS - Selected work",
+            item: { href: "#", subtitle: "Digital interpretation for cultural heritage & education", image: "media/project1_highlight3.png", art: "hearth" }, cta: "View projects" }
+  });
+}
+
+/* ---------- Build the two wheels ---------- */
+const homeEl = document.getElementById("home");
+const casesEl = document.getElementById("cases");
+const detailEl = document.getElementById("csd");
+const headerEl = document.querySelector(".site-header");
+
+const projectsWheel = createWheel({ root: homeEl, items: PROJECTS, prefix: "PROJECT", cta: "View project", loop: true });
+const casesWheel = createWheel({ root: casesEl, items: CASES, prefix: "CASE STUDY", cta: "View case study", loop: false });
+
+/* ---------- Case study detail page: sticky intro + scroll-linked sections ---------- */
+const secList = detailEl.querySelector(".cs-list");
+const secIndex = detailEl.querySelector(".cs-index");
+let secEls = [], secButtons = [], renderedKey = "";
+
+const chevL = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 3 5 7l4 4"/></svg>`;
+const chevR = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 3l4 4-4 4"/></svg>`;
+
+function galleryHTML(sec) {
+  const imgs = sec.images && sec.images.length ? sec.images : [sec];
+  const slides = imgs.map((im, k) => `<div class="cs-slide${k === 0 ? " is-shown" : ""}">${artHTML(im)}</div>`).join("");
+  const nav = imgs.length > 1 ? `
+    <div class="gallery-nav">
+      <button type="button" class="g-prev" aria-label="Previous image">${chevL}</button>
+      <span class="gallery-count"><b>1</b> / ${imgs.length}</span>
+      <button type="button" class="g-next" aria-label="Next image">${chevR}</button>
+    </div>` : "";
+  const hasCaps = imgs.some(im => im.caption);
+  const capEl = hasCaps ? `<span class="slide-cap">${imgs[0].caption || ""}</span>` : "";
+  const cta = sec.link ? `<a class="cs-link-cta" href="${sec.link}" target="_blank" rel="noopener"><span>${sec.cta || "View demo"}</span>${arrow}</a>` : "";
+  return `<div class="cs-media cs-focus" data-caps='${hasCaps ? JSON.stringify(imgs.map(im => im.caption || "")).replace(/'/g, "&#39;") : ""}'><div class="cs-art">${slides}</div>${capEl}${cta}${nav}</div>`;
+}
+function wireZoom(media, items) {
+  media.classList.add("is-zoomable");
+  let x0 = 0, y0 = 0;
+  media.addEventListener("pointerdown", e => { x0 = e.clientX; y0 = e.clientY; });
+  media.addEventListener("click", e => {
+    if (e.target.closest("a, button")) return;                          // View demo, arrows, pause
+    if (Math.hypot(e.clientX - x0, e.clientY - y0) > 8) return;          // that was a swipe
+    const slides = [...media.querySelectorAll(".cs-slide")];
+    const i = Math.max(0, slides.findIndex(sl => sl.classList.contains("is-shown")));
+    slides.forEach(sl => sl.querySelectorAll("video").forEach(v => v.pause()));
+    lightbox.open(items, i);
+  });
+}
+function wireGallery(media) {
+  const slides = [...media.querySelectorAll(".cs-slide")];
+  if (slides.length < 2) return;
+  const count = media.querySelector(".gallery-count b");
+  let cur = 0;
+  const show = (n, dir) => {
+    const next = (n + slides.length) % slides.length;
+    if (next === cur) return;
+    slides.forEach((sl, k) => {
+      sl.classList.toggle("is-prev", dir > 0 ? k === cur : k !== next && k !== cur);
+      sl.classList.toggle("is-shown", k === next);
+    });
+    // only the visible slide's video plays
+    slides.forEach((sl, k) => sl.querySelectorAll("video").forEach(v => {
+      if (k === next && v._visible !== false && !v._userPaused) v.play().catch(() => {}); else v.pause();
+    }));
+    const capEl = media.querySelector(".slide-cap");
+    if (capEl && media.dataset.caps) capEl.textContent = JSON.parse(media.dataset.caps)[next] || "";
+    cur = next; count.textContent = cur + 1;
+    syncToggle(media);
+  };
+  media.querySelector(".g-prev").addEventListener("click", () => show(cur - 1, -1));
+  media.querySelector(".g-next").addEventListener("click", () => show(cur + 1, 1));
+  // horizontal swipe / drag
+  let x0 = null;
+  media.addEventListener("pointerdown", e => { if (!e.target.closest(".gallery-nav")) x0 = e.clientX; });
+  media.addEventListener("pointerup", e => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  });
+}
+
+/* ---------- Lightbox: click a highlight image to view it larger ---------- */
+const lightbox = (() => {
+  const el = document.getElementById("lightbox");
+  const frame = el.querySelector(".lb-frame"), cap = el.querySelector(".lb-cap"), count = el.querySelector(".lb-count");
+  let items = [], cur = 0, lastFocus = null;
+  const render = () => {
+    const it = items[cur];
+    frame.innerHTML = `<div>${artHTML(it, { controls: true })}</div>`;
+    const v = frame.querySelector("video"); if (v) v.play().catch(() => {});
+    cap.textContent = it.caption || "";
+    count.innerHTML = items.length > 1 ? `<b>${cur + 1}</b> / ${items.length}` : "";
+    el.querySelector(".lb-prev").hidden = el.querySelector(".lb-next").hidden = items.length < 2;
+  };
+  const open = (list, i) => {
+    items = list; cur = i; lastFocus = document.activeElement;
+    render();
+    el.hidden = false; void el.offsetWidth;
+    el.classList.add("is-open"); document.body.classList.add("lb-lock");
+    el.querySelector(".lb-close").focus();
+  };
+  const close = () => {
+    el.classList.remove("is-open"); document.body.classList.remove("lb-lock");
+    frame.querySelectorAll("video").forEach(v => v.pause());
+    document.querySelectorAll(".cs-slide.is-shown video[data-auto]").forEach(v => { if (v._visible && !v._userPaused) v.play().catch(() => {}); });
+    setTimeout(() => { if (!el.classList.contains("is-open")) el.hidden = true; }, 350);
+    if (lastFocus) lastFocus.focus({ preventScroll: true });
+  };
+  const go = dir => { cur = (cur + dir + items.length) % items.length; render(); };
+  el.querySelector(".lb-close").addEventListener("click", close);
+  el.querySelector(".lb-prev").addEventListener("click", e => { e.stopPropagation(); go(-1); });
+  el.querySelector(".lb-next").addEventListener("click", e => { e.stopPropagation(); go(1); });
+  el.addEventListener("click", e => { if (e.target === el) close(); });     // click the backdrop
+  addEventListener("keydown", e => {
+    if (el.hidden) return;
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowRight") go(1);
+    if (e.key === "ArrowLeft") go(-1);
+  });
+  return { open };
+})();
+
+/* Shared renderer for case-study and project detail pages.
+   section kinds: "media" (image/gallery + text), "text", "grid" (2-col highlights), "link" (linked case study) */
+function renderDetail(d) {
+  if (d.key === renderedKey) return;
+  renderedKey = d.key;
+  detailEl.classList.toggle("is-main", !!d.main);
+  const back = detailEl.querySelector(".back-link");
+  back.hidden = !d.back;
+  if (d.back) { back.href = d.back.href; back.querySelector(".back-text").textContent = d.back.label; }
+  detailEl.querySelector(".cs-kicker").textContent = d.kicker;
+  detailEl.querySelector("h1").textContent = d.title;
+  detailEl.querySelector(".cs-summary").textContent = d.summary;
+  detailEl.querySelector(".cs-meta").innerHTML = d.meta.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+  secList.innerHTML = ""; secIndex.innerHTML = "";
+  secIndex.style.gridTemplateRows = d.main ? "" : `repeat(${Math.min(4, d.sections.length)}, auto)`;   // 4 in the first column, the rest in the next
+
+  secEls = d.sections.map((sec, i) => {
+    const el = document.createElement("article");
+    const kind = sec.kind || "media";
+    el.className = `cs cs--${kind}`;
+    const label = `
+      <div class="cs-label">
+        <span class="plabel-title"><span>SECTION ${pad(i+1)} - ${sec.name}</span></span>
+      </div>`;
+    const paras = t => (Array.isArray(t) ? t : [t]).map(p => `<p>${p}</p>`).join("");
+    if (kind === "list") {
+      el.innerHTML = `${label}<div class="cs-rows cs-focus">${sec.rows.map(r => `
+        <div class="cs-row">
+          <div class="cs-row-title">${r.title}</div>
+          <div class="cs-row-org">${[r.org, r.when].filter(Boolean).join(" · ")}</div>
+          ${r.text ? `<p class="cs-row-text">${r.text}</p>` : ""}
+        </div>`).join("")}</div>`;
+    } else if (kind === "cols") {
+      el.innerHTML = `${label}<div class="cs-cols cs-focus" style="--ncols:${sec.cols.length}">${sec.cols.map(c => `
+        <div class="cs-col"><h3>${c.title}</h3><ul>${c.items.map(x => `<li>${x}</li>`).join("")}</ul></div>`).join("")}</div>`;
+    } else if (kind === "text") {
+      el.innerHTML = `${label}<div class="cs-body cs-focus">${paras(sec.text)}${sec.html || ""}</div>`;
+    } else if (kind === "grid") {
+      el.innerHTML = `${label}<div class="hl-grid cs-focus">${sec.items.map(it => `
+        <figure class="hl-item" tabindex="0" style="margin:0">
+          <div class="cs-art">${artHTML(it)}</div>
+          <figcaption class="hl-cap">${it.caption}</figcaption>
+        </figure>`).join("")}</div>`;
+      el.querySelectorAll(".hl-item").forEach((fig, k) => {
+        fig.addEventListener("click", () => lightbox.open(sec.items, k));
+        fig.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); lightbox.open(sec.items, k); } });
+      });
+    } else if (kind === "link") {
+      // links a project to its case study, or a case study to its project page
+      const toProject = sec.projectIndex !== undefined;
+      const c = toProject ? PROJECTS[sec.projectIndex] : CASES[sec.caseIndex];
+      const cta = toProject ? "View project" : "View case study";
+      el.innerHTML = `${label}
+        <a class="cs-media cs-link cs-focus" href="${c.href}" aria-label="${cta}: ${c.title}">
+          <div class="cs-art">${artHTML(c)}</div>
+          <span class="cs-link-cta"><span>${cta}</span>${arrow}</span>
+        </a>`;
+    } else {
+      el.innerHTML = `${label}${galleryHTML(sec)}<div class="cs-body">${paras(sec.text)}</div>`;
+      wireGallery(el.querySelector(".cs-media"));
+      wireZoom(el.querySelector(".cs-media"), sec.images && sec.images.length ? sec.images : [sec]);
+    }
+    secList.appendChild(el);
+    const li = document.createElement("li");
+    li.innerHTML = `<button type="button"><b>${pad(i+1)}</b><span>${sec.name}</span></button>`;
+    li.firstChild.addEventListener("click", () => scrollToSection(i));
+    secIndex.appendChild(li);
+    return el;
+  });
+  secButtons = [...secIndex.querySelectorAll("button")];
+  observeVideos(secList);
+
+  const n = d.next;
+  detailEl.querySelector(".cs-next-wrap").innerHTML = `
+    <a class="cs-next" href="${n.item.href}">
+      <span class="cs-next-kicker">${n.kicker}</span>
+      <span class="cs-next-title"><span>${n.label}</span></span>
+      <span class="cs-next-sub">${n.item.subtitle}</span>
+      <span class="cs-next-media"><span class="cs-art">${artHTML(n.item)}</span>
+        <span class="cs-next-cta">${n.cta}${arrow}</span></span>
+    </a>`;
+}
+
+function renderCase(ci) {
+  const c = CASES[ci], ni = (ci + 1) % CASES.length;
+  renderDetail({
+    key: `case${ci}`, kicker: `Case Study ${pad(ci + 1)}`, title: c.title, summary: c.summary, meta: c.meta,
+    back: { href: "#case-studies", label: "Case Studies" },
+    sections: (CASE_DETAILS[ci] || []).map((sec, i) => ({ ...sec, name: SECTION_NAMES[i] || sec.title, kind: sec.kind || ((sec.images || sec.art || sec.image) ? "media" : "text") })),
+    next: { kicker: "Next case study", label: `CASE STUDY ${pad(ni + 1)} - ${CASES[ni].title}`, item: CASES[ni], cta: "View case study" }
+  });
+}
+
+function renderProject(pi) {
+  const p = PROJECTS[pi], d = PROJECT_DETAILS[pi], ni = (pi + 1) % PROJECTS.length;
+  const sections = [
+    { name: "Overview", kind: "text", subtitle: d.overview.subtitle, text: d.overview.text },
+    { name: "Demo", kind: "media", ...d.demo },
+    { name: "Highlights", kind: "grid", subtitle: d.highlights.subtitle, items: d.highlights.items }
+  ];
+  if (d.caseStudy !== null && d.caseStudy !== undefined && CASES[d.caseStudy])
+    sections.push({ name: "Case Study", kind: "link", subtitle: "The full process behind this project", caseIndex: d.caseStudy });
+  renderDetail({
+    key: `proj${pi}`, kicker: `Project ${pad(pi + 1)}`, title: p.title, summary: d.summary, meta: d.meta,
+    back: { href: "#", label: "Projects" },
+    sections,
+    next: { kicker: "Next project", label: `PROJECT ${pad(ni + 1)} - ${PROJECTS[ni].title}`, item: PROJECTS[ni], cta: "View project" }
+  });
+}
+
+// Continuous position p between sections (0 = first, 1 = second, …), like the
+// wheel: the section in focus is in colour, the others ease to grey.
+function sectionCentres() {
+  const centres = secEls.map(el => {
+    const r = el.querySelector(".cs-focus").getBoundingClientRect();
+    return r.top + scrollY + r.height / 2;
+  });
+  const headerH = headerEl.offsetHeight;
+  const focusAt = y => y + headerH + (innerHeight - headerH) / 2;
+  const maxScroll = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+  const last = centres.length - 1;
+  // Stretch section positions into the range the page can actually scroll
+  // through, so every section (including the first and last) gets full colour.
+  // Use each image's real centre, so jumping to a section lands its image
+  // exactly in the middle of the visible area. Only the first/last are nudged
+  // to the top/bottom of the page when they can't physically reach the middle.
+  const lo = focusAt(0), hi = focusAt(maxScroll);
+  const natural = centres.slice();
+  centres[0] = Math.max(centres[0], lo);
+  centres[last] = Math.min(centres[last], hi);
+  const ok = centres.every((c, i) => c >= lo && c <= hi && (i === 0 || c > centres[i - 1]));
+  if (!ok) {                       // fallback: stretch everything into the scrollable range
+    const c0 = natural[0], cL = natural[last];
+    const a = Math.max(c0, lo), b = Math.min(cL, hi);
+    if (cL > c0 && b > a) for (let i = 0; i <= last; i++) centres[i] = a + (natural[i] - c0) * (b - a) / (cL - c0);
+  }
+  return { centres, focusAt };
+}
+function scrollToSection(i) {
+  const { centres, focusAt } = sectionCentres();
+  scrollTo({ top: Math.max(0, centres[i] - focusAt(0)), behavior: reduceMotion ? "auto" : "smooth" });
+}
+function fitIntro() {
+  const col = detailEl.querySelector(".cases-intro");
+  if (detailEl.hidden || mobileMQ.matches) { col.style.removeProperty("--fit"); return; }
+  col.style.removeProperty("--fit");
+
+}
+function syncHeaderH() { document.documentElement.style.setProperty("--header-h", `${headerEl.offsetHeight}px`); }
+function updateSections() {
+  if (!secEls.length) return;
+  const { centres, focusAt } = sectionCentres();
+  const last = centres.length - 1;
+  const focus = Math.min(Math.max(focusAt(scrollY), centres[0]), centres[last]);
+  let p = 0;
+  for (let i = 0; i < last; i++) if (focus >= centres[i]) p = i + Math.min(1, (focus - centres[i]) / (centres[i + 1] - centres[i]));
+  const best = Math.round(p);
+  secEls.forEach((el, i) => {
+    const d = Math.min(1, Math.abs(i - p));
+    el.style.setProperty("--t", (d * d * (3 - 2 * d)).toFixed(3));
+    el.classList.toggle("is-current", i === best);
+  });
+  secButtons.forEach((b, i) => b.classList.toggle("is-current", i === best));
+  // If the left column is taller than the screen, scroll it along with the
+  // page so the current section in the index is always visible.
+}
+let secTick = false;
+addEventListener("scroll", () => {
+  headerEl.classList.toggle("is-scrolled", scrollY > 4);
+  if (secTick || detailEl.hidden) return;
+  secTick = true;
+  requestAnimationFrame(() => { updateSections(); secTick = false; });
+}, { passive: true });
+
+/* ---------- Router (hash-based, works on GitHub Pages) ---------- */
+const soonEl = document.getElementById("soon");
+const MAINS = [homeEl, casesEl, detailEl, soonEl];
+const SOON = {
+  photos: { title: "Photo Gallery", text: "The photo gallery is still being developed. Please check back soon." },
+  blogs:  { title: "Blogs",         text: "The blog is still being developed. Please check back soon." }
+};
+function pageFor(name) {
+  if (name === "home")  return { el: homeEl,  nav: "home",  title: "Evaine Sun — Digital Interpretation for Cultural Heritage", enter: () => projectsWheel.enter() };
+  if (name === "cases") return { el: casesEl, nav: "cases", title: "Case Studies — Evaine Sun", enter: () => casesWheel.enter() };
+  if (SOON[name]) return { el: soonEl, nav: "none", title: `${SOON[name].title} — Evaine Sun`, enter: () => {
+    document.getElementById("soonTitle").textContent = SOON[name].title;
+    document.getElementById("soonText").textContent = SOON[name].text;
+  } };
+  if (name === "about") return { el: detailEl, nav: "about", title: "About — Evaine Sun", enter: () => { renderAbout(); fitIntro(); updateSections(); } };
+  if (name.startsWith("proj")) {
+    const pi = Number(name.slice(4));
+    return { el: detailEl, nav: "home", title: `${PROJECTS[pi].title} — Evaine Sun`, enter: () => { renderProject(pi); fitIntro(); updateSections(); } };
+  }
+  const ci = Number(name.slice(4));
+  return { el: detailEl, nav: "cases", title: `${CASES[ci].title} — Evaine Sun`, enter: () => { renderCase(ci); fitIntro(); updateSections(); } };
+}
+function pageFromHash() {
+  const h = location.hash;
+  if (h === "#case-studies") return "cases";
+  if (h === "#about") return "about";
+  if (h === "#photo-gallery") return "photos";
+  if (h === "#blogs") return "blogs";
+  const m = h.match(/^#case-study-(\d+)$/);
+  if (m && CASES[Number(m[1]) - 1]) return `case${Number(m[1]) - 1}`;
+  const pm = h.match(/^#project-(\d+)$/);
+  if (pm && PROJECTS[Number(pm[1]) - 1]) return `proj${Number(pm[1]) - 1}`;
+  if (h === "" || h === "#" || h === "#projects") return "home";
+  return null;                      // other anchors (e.g. #project-02) keep the current page
+}
+let currentPage = null, routeTimer = null;
+function route() {
+  // close any open dropdown after following one of its links
+  if (document.activeElement && document.activeElement.closest(".menu")) document.activeElement.blur();
+  document.querySelectorAll(".nav-item.is-open").forEach(o => { o.classList.remove("is-open"); o.querySelector(".nav-trigger").setAttribute("aria-expanded", "false"); });
+  const name = pageFromHash() || currentPage || "home";
+  if (name === currentPage) return;
+  const next = pageFor(name), prevEl = currentPage ? pageFor(currentPage).el : null;
+  currentPage = name;
+  document.querySelectorAll(".nav-link[data-route]").forEach(a => {
+    if (a.dataset.route === next.nav) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
+  document.title = next.title;
+  const enter = () => {
+    MAINS.forEach(el => { el.classList.remove("is-leaving"); if (el !== next.el) el.hidden = true; });
+    next.el.classList.add("is-entering");
+    next.el.hidden = false;
+    scrollTo(0, 0);
+    headerEl.classList.remove("is-scrolled");
+    next.enter();
+    void next.el.offsetWidth;
+    next.el.classList.remove("is-entering");
+  };
+  clearTimeout(routeTimer);
+  if (!prevEl || reduceMotion) { enter(); return; }
+  prevEl.classList.add("is-leaving");
+  routeTimer = setTimeout(enter, 260);
+}
+addEventListener("hashchange", route);
+
+/* ---------- Init ---------- */
+observeVideos();
+document.querySelectorAll(".cy-year").forEach(n => n.textContent = new Date().getFullYear());
+syncHeaderH();
+const refreshAll = () => { syncHeaderH(); projectsWheel.refresh(); casesWheel.refresh(); if (!detailEl.hidden) { fitIntro(); updateSections(); } };
+addEventListener("resize", refreshAll);
+if (document.fonts) document.fonts.ready.then(refreshAll);
+route();
+</script>
+</body>
+</html>
