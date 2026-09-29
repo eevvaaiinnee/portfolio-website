@@ -1934,7 +1934,7 @@ const SOON = {
   blogs:  { title: "Blogs",         text: "The blog is still being developed. Please check back soon." }
 };
 function pageFor(name) {
-  if (name === "home")  return { el: homeEl,  nav: "home",  title: "Evaine Sun — Digital Interpretation for Cultural Heritage", enter: () => projectsWheel.enter() };
+  if (name === "home")  return { el: homeEl,  nav: "home",  title: "Evaine Sun — Digital Interpretation for Cultural Heritage and Education", enter: () => projectsWheel.enter() };
   if (name === "cases") return { el: casesEl, nav: "cases", title: "Case Studies — Evaine Sun", enter: () => casesWheel.enter() };
   if (SOON[name]) return { el: soonEl, nav: "none", title: `${SOON[name].title} — Evaine Sun`, enter: () => {
     document.getElementById("soonTitle").textContent = SOON[name].title;
