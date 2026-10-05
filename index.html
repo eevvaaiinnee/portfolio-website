@@ -1302,14 +1302,14 @@ const CASES = [
     title: "From Historic Space to Interactive 3D Experience",
     subtitle: "3D Digitization Workflow",
     summary: "A Gaussian splatting scan of a historic hearth, turned into an interactive 3D model that visitors can explore on a website from anywhere.",
-    meta: [["Role", "3D scanning, post production, website development, workflow design"], ["Context", "Montclair History Center"], ["Tools", "DSLR camera, Postshot, SuperSplat, Claude"]],
+    meta: [["Role", "3D scanning, post production, website development, workflow design"], ["Context", "Montclair History Center, 2026"], ["Tools", "DSLR camera, Postshot, SuperSplat, Claude"]],
     href: "#case-study-01", image: "media/case1_context1.jpg", art: "hearth"
   },
   {
     title: "Designing Accessible, Multisensory Museum Experiences",
     subtitle: "Exhibition Development",
     summary: "A multisensory exhibition with accessibility design for the Pharmacy Room at Intrepid Museum's Sick Bay.",
-    meta: [["Role", "Exhibition design, UX design, research, project coordination"], ["Context", "Intrepid Museum, NYU Ability Project"], ["Tools", "Figma"]],
+    meta: [["Role", "Exhibition design, UX design, research, project coordination"], ["Context", "Intrepid Museum, NYU Ability Project, 2025"], ["Tools", "Figma"]],
     href: "#case-study-02", image: "media/case2_process1.png", art: "csProcess"
   }
 ];
@@ -1463,13 +1463,13 @@ const CASE_DETAILS = [
     { text: "The goal was to create an accessible digital experience that combines 3D documentation with historical interpretation. Rather than presenting the hearth as a static photograph, I wanted audiences to explore the space themselves while learning about its historical context." },
     { text: "I researched the hearth's physical and historical context to determine which details would be most meaningful to highlight in the digital experience. I also explored 3D Gaussian splatting as a method for capturing complex architectural spaces and considered how resolution, navigation, and device performance would affect accessibility." },
     { images: [
-        { image: "media/case1_process1.png", fit: "contain", caption: "Raw footage captured on-site (partial)." },
+        { image: "media/case1_process1.png", fit: "contain", caption: "Raw footage captured on-site (partial screenshot)." },
         { image: "media/case1_process2.png", fit: "contain", caption: "Scan processed in Postshot." },
         { image: "media/case1_process3.png", fit: "contain", caption: "Scan cleaned in SuperSplat (full view outside the building)." },
         { image: "media/case1_process4.png", fit: "contain", caption: "Cleaning extra splats to optimize file size." },
         { image: "media/case1_process5.png", fit: "contain", caption: "Recording camera positions for story nodes with the calibration tool." },
         { image: "media/case1_process6.png", fit: "contain", caption: "Brainstormed the interactive experience." } ],
-      text: "I captured the hearth on-site using a Nikon D850 and processed the footage (900+ images) into a 3D Gaussian splat using Postshot. I then cleaned the scan in SuperSplat to make sure the file size was optimized for various devices. I then consulted about the historic context and brainstormed the website experience around seven story nodes, using camera positioning and scrolling to guide audiences through different areas of the model while connecting each view to interpretive text." },
+      text: "I captured the hearth on-site using a Nikon D850 and processed the footage (900+ images) into a 3D Gaussian splat using Postshot. I then cleaned the scan in SuperSplat to make sure the file size was optimized for various devices. I consulted about the historic context and brainstormed the website experience around seven story nodes, using camera positioning and scrolling to guide audiences through different areas of the model while connecting each view to interpretive text." },
     { text: `The final experience combines an interactive 3D model with scroll-based storytelling, allowing users to orbit, navigate, and zoom into the hearth from different perspectives. I also developed a camera calibration tool and incorporated responsive controls so the experience could be accessed across desktop and mobile devices. (View more on the project page <a class="text-link" href="#project-01">here</a>.)` },
     { kind: "link", projectIndex: 0 },   // Project Page → Project 01
     { text: "The project resulted in a publicly accessible website featuring the interactive 3D model, seven interpretive story nodes, and supporting historical content. It demonstrates how emerging 3D technologies can extend the experience of a physical historic site beyond the museum itself. I also prepared a project documentation file detailing the goals, context, workflows, and technical specifications to support future maintenance and sustainable development." },
@@ -1486,9 +1486,9 @@ const CASE_DETAILS = [
         { image: "media/case2_process3.png", fit: "contain", caption: "Sitemap of the interactive touch screen." },
         { image: "media/case2_process4.png", fit: "contain", caption: "Low-fidelity prototype of the interactive touch screen." } ],
       text: "We developed ideas through three rounds of brainstorming, combining interactive concepts with additional sensory elements and refining them through feedback. The process evolved into three connected components: an interactive recipe-making touchscreen, scent bottles, and tactile drawers, supported by accessible labels and directions. The development of the interactive touchscreen includes a sitemap, a low-fidelity prototype, and a high-fidelity prototype." },
-    { text: `I contributed to developing the interactive recipe-making experience and its high-fidelity prototype, where visitors follow a historical pharmacy recipe through a drag-and-drop mixing activity. I also worked on accessibility features including screen-reader compatibility, audio description, haptic feedback, tactile overlays, Braille, and large-print materials. (View more on the project page <a class="text-link" href="#project-04">here</a>.)` },
+    { text: `I contributed to developing the interactive recipe-making experience and its prototypes, where visitors follow a historical pharmacy recipe through a drag-and-drop mixing activity. I also worked on accessibility features including screen-reader compatibility, audio description, haptic feedback, tactile overlays, Braille, and large-print materials. (View more on the project page <a class="text-link" href="#project-04">here</a>.)` },
     { kind: "link", projectIndex: 3 },   // Project Page → Project 04
-    { text: "The project resulted in low- and high-fidelity prototypes for the touchscreen experience, scent-based interaction, labels, and physical components. Rather than treating accessibility as an add-on, the proposed experience incorporated multiple modes of interaction—including visual, tactile, auditory, and olfactory elements—throughout the design." },
+    { text: "The project resulted in a mockup of the interactive touch screen experience, scent-based interactions, labels, and physical components. Rather than treating accessibility as an add-on, the proposed experience incorporated multiple modes of interaction—including visual, tactile, auditory, and olfactory elements—throughout the design." },
     { text: "This project showed me that accessible interpretation is not simply about adding accommodations to an existing experience. Instead, it involves considering people with various needs and preferences from the beginning. Designing for a small historic space also pushed me to think about how physical constraints, sensory interaction, digital interfaces, and accessibility can work together to create a more inclusive museum experience." }
   ]
 ];
@@ -1515,7 +1515,7 @@ ART.exhibitWave  = crop("exhibit", "120 620 820 280");
 const PROJECT_DETAILS = [
   { // 01 3D-scanned Hearth
     summary: "A Gaussian splatting scan of a historic hearth, turned into an interactive 3D model that visitors can explore on a website from anywhere.",
-    meta: [["Role", "3D scanning, post production, website development, workflow design"], ["Context", "Montclair History Center"], ["Tools", "DSLR camera, Postshot, SuperSplat, Claude"]],
+    meta: [["Role", "3D scanning, post production, website development, workflow design"], ["Context", "Montclair History Center, 2026"], ["Tools", "DSLR camera, Postshot, SuperSplat, Claude"]],
     overview: { text: ["The 3D-scanned Hearth uses 3D Gaussian splatting to digitally capture the historic hearth and resulted in a website featuring an interactive 3D model and interpretive text. Audiences can explore the 3D model while learning about the history and context of the hearth. The goal was to make local history more interactive and accessible to the public."] },
     demo: { images: [{ video: "media/project1_demo1.mp4" }],
       text: "Scroll the page for a guided tour, or use the controls to explore the 3D model at your wish.", link: "https://3d-scanned-hearth.montclairhistory.org/" },
@@ -1523,46 +1523,46 @@ const PROJECT_DETAILS = [
       { image: "media/project1_highlight1.png", caption: "Split-screens, text on the left and the 3D model on the right." },
       { video: "media/project1_highlight2.mp4", caption: "Scrolling between text sections will anchor/re-anchor camera views." },
       { image: "media/project1_highlight3.png", caption: "A close-up of the 3D-scanned hearth." },
-      { image: "media/project1_highlight4.png", caption: "A control panel about navigation and allows the audience to select the graphics quality as they wish." } ] },
+      { image: "media/project1_highlight4.png", caption: "A control panel indicating navigation and allowing the audience to select the graphics quality as they wish." } ] },
     caseStudy: 0
   },
   { // 02 Montclair Historic Map
     summary: "An interactive website map layering historic atlases, photographs, and stories over today's streets.",
-    meta: [["Role", "Georeferencing, website development, research, workflow design"], ["Context", "Montclair History Center"], ["Tools", "Map Warper, Claude"]],
+    meta: [["Role", "Georeferencing, website development, research, workflow design"], ["Context", "Montclair History Center, 2026"], ["Tools", "Map Warper, Claude"]],
     overview: { text: ["The interactive Montclair Historic Map uses georeferencing to align a historic 1906 atlas of Montclair with a modern map, resulting in a website featuring the overlaid historic map and interpretive drop pins. Audiences can adjust the transparency of the historic map overlay, toggle individual map plates on or off, and explore additional information through the drop pins. Admins can edit existing drop pins or add new ones. The goal was to make local history more interactive and accessible to the public."] },
     demo: { images: [{ video: "media/project2_demo1.mp4" }, { video: "media/project2_demo2.mp4" }],
       text: "Use control panels to adjust historic plates and overlay. Click on drop pins to view more. Admins can edit/add drop pins.", link: "https://interactive-1906-montclair-map.montclairhistory.org/" },
     highlights: { items: [
       { video: "media/project2_highlight1.mp4", caption: "Interacting with the map involves intuitive dragging." },
-      { video: "media/project2_highlight2.mp4", caption: "The slider can adjust the opacity of the historic map overlay." },
-      { image: "media/project2_highlight3.png", caption: "Clicking on a drop pin will show a detailed introduction, link, and image of the location." },
-      { image: "media/project2_highlight4.png", caption: "When logged in as admin, drop pins can be modified." } ] },
+      { video: "media/project2_highlight2.mp4", caption: "The slider can adjust the transparency of the historic map overlay." },
+      { image: "media/project2_highlight3.png", caption: "Clicking on a drop pin will show the detailed introduction, link, and image of the location." },
+      { image: "media/project2_highlight4.png", caption: "When logged in as an admin, drop pins can be modified." } ] },
     caseStudy: null
   },
   { // 03 Buddha Dipankara
     summary: "A multisensory installation with physical and digital elements showcasing representative cultural artifacts of four regions along the Silk Road.",
-    meta: [["Role", "Exhibition design, 3D scanning, post production, research, project management"], ["Context", "B.S. Senior Project, NYU Integrated Design and Media"], ["Tools", "DSLR camera, RealityScan, Blender"]],
+    meta: [["Role", "Exhibition design, 3D scanning, post production, research, project management"], ["Context", "B.S. Senior Project, NYU Integrated Design and Media, 2025"], ["Tools", "DSLR camera, RealityScan, Blender"]],
     overview: { text: ["Buddha Dipankara (Dingguang) from Northern Wei dynasty (386–534), on view at The MET, was 3D-scanned with photogrammetry and rendered into a video with point cloud animation, as part of the Interactive Silk Road project."] },
     demo: { images: [{ video: "media/project3_demo1.mp4" }],
       text: `View entire project presentation <a class="text-link" href="https://drive.google.com/file/d/1a925enCNAt6Uz5VACmHjJpNxgQV055oT/view?usp=sharing" target="_blank" rel="noopener">here</a>. Visit <a class="text-link" href="https://sketchfab.com/3d-models/buddha-dipankara-01364689bc554d149418152e339e5024" target="_blank" rel="noopener">here</a> to interact with the 3D model on Sketchfab.`, link: "https://sketchfab.com/3d-models/buddha-dipankara-01364689bc554d149418152e339e5024" },
     highlights: { items: [
       { image: "media/project3_highlight1.png", caption: "Left-front 3/4 view of the 3D model's rendered detail." },
       { image: "media/project3_highlight2.png", caption: "Right-back 3/4 view of the 3D model's rendered detail." },
-      { image: "media/project3_highlight3.gif", caption: "Dissolve effect in the rendered video." },
+      { image: "media/project3_highlight3.gif", caption: "Dissolve effect applied to the 3D model." },
       { image: "media/project3_highlight4.jpg", caption: "The entire Interactive Silk Road installation." } ] },
     caseStudy: null
   },
   { // 04 Pharmacy Compounding Lab
     summary: "A multisensory exhibition with accessibility design for the Pharmacy Room at Intrepid Museum's Sick Bay.",
-    meta: [["Role", "Exhibition design, UX design, research, project coordination"], ["Context", "Intrepid Museum, NYU Ability Project"], ["Tools", "Figma"]],
-    overview: { text: ["Pharmacy Compounding Lab is an interactive touch screen experience as part of the Pharmacy Room at Intrepid Museum project, a collaborative project designing an accessible and interactive visitor experience. The entire experience consists of an interactive touch screen, scent bottles, tactile drawers, and labels and directives."] },
+    meta: [["Role", "Exhibition design, UX design, research, project coordination"], ["Context", "Intrepid Museum, NYU Ability Project, 2025"], ["Tools", "Figma"]],
+    overview: { text: ["Pharmacy Compounding Lab is an interactive touch screen experience as part of the Pharmacy Room at Intrepid Museum project, a collaborative project designing an accessible and interactive visitor experience. The entire experience consists of a touch screen, scent bottles, tactile drawers, and labels and directives."] },
     demo: { images: [{ video: "media/project4_demo1.mp4" }],
       text: `View entire project presentation <a class="text-link" href="https://drive.google.com/file/d/1h3a4tucMJUR_Y4hCu9Sn5L_VBHNoyMuX/view?usp=sharing" target="_blank" rel="noopener">here</a>. Visit <a class="text-link" href="https://www.figma.com/proto/w1bJnrbNIW5Rrc7QGsLpii/Activity-1--Make-a-recipe--reader-rail-?node-id=80-455&amp;p=f&amp;t=5FhUCBrVdsfH4WVO-1&amp;scaling=scale-down&amp;content-scaling=fixed&amp;page-id=79%3A34&amp;starting-point-node-id=80%3A455" target="_blank" rel="noopener">here</a> to interact with the touch screen on Figma. Visit <a class="text-link" href="https://sketchfab.com/3d-models/pharmacy-scent-demo-698f9f8a1a71485abd2adeaba1315a06" target="_blank" rel="noopener">here</a> to interact with the scent bottles on Sketchfab.`, link: "https://www.figma.com/proto/w1bJnrbNIW5Rrc7QGsLpii/Activity-1--Make-a-recipe--reader-rail-?node-id=80-455&amp;p=f&amp;t=5FhUCBrVdsfH4WVO-1&amp;scaling=scale-down&amp;content-scaling=fixed&amp;page-id=79%3A34&amp;starting-point-node-id=80%3A455" },
     highlights: { items: [
       { image: "media/project4_highlight1.png", caption: "Landing page of Pharmacy Compounding Lab." },
       { image: "media/project4_highlight2.png", caption: "Choose-your-recipe page of Pharmacy Compounding Lab." },
       { image: "media/project4_highlight3.png", caption: "Close-up of a recipe." },
-      { image: "media/project4_highlight4.png", caption: "Close-up of the compounding process." } ] },
+      { image: "media/project4_highlight4.png", caption: "Close-up of the compounding interface." } ] },
     caseStudy: 1
   }
 ];
@@ -1597,8 +1597,8 @@ const ABOUT = {
   meta: [],
   sections: [
     { name: "Bio", kind: "media", images: [{ image: "media/bio.png" }],
-      text: ["I create digital experiences that help people connect with culture, history, and place: 3D digitization, interactive websites, and digital exhibitions.",
-             "I'm interested in creative experiences between physical and digital spaces. My work brings together research, design, and technology with a focus on interpretation: making cultural heritage more accessible, engaging, and meaningful to people."] },
+      text: ["I create digital experiences that help people connect with culture, history, and place: 3D digitization, interactive websites, and geospatial interpretations.",
+             "I’m interested in creative experiences between physical and digital spaces. My work brings together research, design, and technology with a focus on interpretation: making cultural heritage more accessible and engaging to people."] },
     { name: "Experience", kind: "list", rows: [
       { title: "Rubin Museum of Himalayan Art", org: "Editorial and Digital Content Intern", when: "09/2026 – present",
         text: "Contribute to digital interpretation and content initiatives related to Himalayan art and cultural heritage, supporting the development and presentation of museum content across digital platforms." },
@@ -1614,10 +1614,10 @@ const ABOUT = {
       { title: "New York University, Tandon School of Engineering", org: "Integrated Design & Media", when: "M.S. & B.S., 2021 – 2026",
         text: "Integrated master's and bachelor's degrees, focused on digital cultural heritage, minored in Anthropology." } ] },
     { name: "Skills & Tools", kind: "cols", cols: [
-      { title: "Digital & Design", items: ["3D digitization & scanning", "Exhibition & experience design", "Digital asset & website content management", "Multimedia production", "Digital marketing & social media", "Prototyping & installation"] },
+      { title: "Digital & Design", items: ["3D digitization & scanning", "Experience & exhibition design", "Digital asset & website content management", "Multimedia production", "Digital marketing & social media", "Prototyping & installation"] },
       { title: "Miscellaneous", items: ["Project management & documentation", "Event management & logistics", "Workflow development", "Cross-department coordination"] } ] },
     { name: "Beyond Work", kind: "media", images: [{ image: "media/beyond_work.jpg" }],
-      text: `Outside of work, you'll find me traveling around the world and developing personal projects of other topics and mediums. View my photo gallery <a class="text-link" href="#photo-gallery">here</a> and blogs <a class="text-link" href="#blogs">here</a>.` },
+      text: `Outside of work, you'll find me traveling around the world and developing projects of other topics and mediums. View my photos <a class="text-link" href="#photo-gallery">here</a> and blogs <a class="text-link" href="#blogs">here</a>.` },
     { name: "Contact", kind: "text",
       text: "I'm always happy to talk about cultural heritage, creative projects, and new collaborations.",
       html: `<div class="link-row">
