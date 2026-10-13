@@ -584,6 +584,7 @@
   .lb-next { right: 1rem; top: 50%; transform: translateY(-50%); }
   .lb-prev:hover svg { transform: translateX(-3px); }
   .lb-next:hover svg { transform: translateX(3px); }
+  html { scrollbar-gutter: stable; }
   body.lb-lock { overflow: hidden; }
 
   /* Linked case study inside a project */
@@ -2242,8 +2243,8 @@ const PHOTO_LIST = {
     ["Na2_24WA_03.JPG", "Sunset at Space Needle", "", "Space Needle, Seattle, Washington, US", "03/18/2024"],
     ["Na3_26HI_21.JPG", "Sunset at Maunakea", "", "Maunakea Visitor Information Station, Hawaii, US", "05/27/2026"],
     ["Na4_25ME_09.JPG", "Sunset at Acadia", "", "Acadia National Park, Maine, US", "11/28/2025"],
-    ["Na5_24HL_07.JPG", "A Piece of Cloud", "", "From Harbin to Mohe, Heilongjiang, China", "06/19/2024"],
-    ["Na6_24HL_08.JPG", "Floating Forest", "", "From Harbin to Mohe, Heilongjiang, China", "06/19/2024"],
+    ["Na5_24HL_07.JPG", "A Piece of Cloud", "", "From Harbin 哈尔滨 to Mohe 漠河, Heilongjiang 黑龙江, China", "06/19/2024"],
+    ["Na6_24HL_08.JPG", "Floating Forest", "", "From Harbin 哈尔滨 to Mohe 漠河, Heilongjiang 黑龙江, China", "06/19/2024"],
     ["Na7_24HL_06.JPG", "Transmission Tower Under Sunset", "", "From Harbin 哈尔滨 to Mohe 漠河, Heilongjiang 黑龙江, China", "06/19/2024"],
     ["Na8_26HI_22.JPG", "Sunset at Maunakea", "", "Maunakea Visitor Information Station, Hawaii, US", "05/27/2026"],
     ["Na9_24GX_10.JPG", "Sunset at Dadunhai 大墩海", "", "Dadunhai 大墩海, Beihai 北海, Guangxi 广西, China", "06/14/2024"],
@@ -2425,6 +2426,10 @@ function showGalleryCat(i, animate) {
   }, 260);
 }
 addEventListener("resize", layoutGallery);
+if ("ResizeObserver" in window) {
+  let lastW = 0;
+  new ResizeObserver(() => { const w = galGrid.clientWidth; if (w && w !== lastW) { lastW = w; layoutGallery(); } }).observe(galGrid);
+}
 
 /* ============================================================
    BLOGS
