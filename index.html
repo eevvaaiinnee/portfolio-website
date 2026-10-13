@@ -903,7 +903,7 @@
         <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 4.75 6 7.75l3-3"/></svg>
       </button>
       <ul class="menu">
-        <li><a href="#photo-gallery"><span>Photos</span><svg class="menu-ext" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></li>
+        <li><a href="#photos"><span>Photos</span><svg class="menu-ext" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></li>
         <li><a href="#blogs"><span>Blogs</span><svg class="menu-ext" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></li>
       </ul>
     </div>
@@ -1803,7 +1803,7 @@ const ABOUT = {
       { title: "Digital & Design", items: ["3D digitization & scanning", "Exhibition & experience design", "Digital asset & website content management", "Multimedia production", "Digital marketing & social media", "Prototyping & installation"] },
       { title: "Miscellaneous", items: ["Project management & documentation", "Event management & logistics", "Workflow development", "Cross-department coordination"] } ] },
     { name: "Beyond Work", kind: "media", images: [{ image: "media/beyond_work.jpg" }],
-      text: `Outside of work, you'll find me traveling around the world and developing personal projects of other topics and mediums. View my photo gallery <a class="text-link" href="#photo-gallery">here</a> and blogs <a class="text-link" href="#blogs">here</a>.` },
+      text: `Outside of work, you'll find me traveling around the world and developing personal projects of other topics and mediums. View my photo gallery <a class="text-link" href="#photos">here</a> and blogs <a class="text-link" href="#blogs">here</a>.` },
     { name: "Contact", kind: "text",
       text: "I'm always happy to talk about cultural heritage, creative projects, and new collaborations.",
       html: `<div class="link-row">
@@ -2147,7 +2147,7 @@ function pageFromHash() {
   const h = location.hash;
   if (h === "#case-studies") return "cases";
   if (h === "#about") return "about";
-  if (h === "#photo-gallery") return "photos";
+  if (h === "#photos" || h === "#photo-gallery") return "photos";   // old link still works
   if (h === "#blogs") return "blogs";
   const m = h.match(/^#case-study-(\d+)$/);
   if (m && CASES[Number(m[1]) - 1]) return `case${Number(m[1]) - 1}`;
