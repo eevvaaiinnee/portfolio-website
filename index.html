@@ -1241,6 +1241,29 @@ const arrow = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke
 // Render an illustration with unique gradient ids, so the same artwork can
 // appear on several pages without the hidden copy breaking the visible one.
 let artSeq = 0;
+/* File names on GitHub are case-sensitive. If an image or video isn't found exactly as written,
+   quietly try common capitalisation variants (homepage.png, Homepage.PNG, .jpeg/.jpg …) before giving up. */
+function caseVariants(src) {
+  const m = src.match(/^(.*\/)([^\/]+?)(\.[^.\/]+)?$/); if (!m) return [];
+  const [, dir, stem, ext = ""] = m;
+  const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
+  const stems = [stem, stem.toLowerCase(), cap(stem), cap(stem.toLowerCase()), stem.toUpperCase()];
+  let exts = [ext, ext.toLowerCase(), ext.toUpperCase()];
+  if (/^\.jpe?g$/i.test(ext)) exts = exts.concat([".jpg", ".JPG", ".jpeg", ".JPEG"]);
+  const out = [];
+  for (const st of stems) for (const ex of exts) { const p = dir + st + ex; if (p !== src && !out.includes(p)) out.push(p); }
+  return out;
+}
+addEventListener("error", e => {
+  const el = e.target;
+  if (!(el instanceof HTMLImageElement || el instanceof HTMLVideoElement)) return;
+  const first = el.dataset.src0 || el.getAttribute("src");
+  if (!first || !first.startsWith("media/")) return;
+  if (!el.dataset.src0) { el.dataset.src0 = first; el._alts = caseVariants(first); }
+  const next = el._alts && el._alts.shift();
+  if (next) el.setAttribute("src", next);
+}, true);
+
 function artHTML(item, opts = {}) {
   if (item.svg) { const k = ++artSeq; return item.svg.replace(/id="([\w-]+)"/g, `id="$1_${k}"`).replace(/url\(#([\w-]+)\)/g, `url(#$1_${k})`); }
   const fit = item.fit ? ` style="object-fit:${item.fit}"` : "";
@@ -3858,7 +3881,7 @@ function justifyGallery(g) {
 }
 function matchHeights() {
   postBody.querySelectorAll("figure[data-match]").forEach(f => {
-    const ref = [...postBody.querySelectorAll("img")].find(im => im.getAttribute("src") === f.dataset.match);
+    const ref = [...postBody.querySelectorAll("img")].find(im => (im.dataset.src0 || im.getAttribute("src")) === f.dataset.match);
     const im = f.querySelector("img"); if (!ref || !im) return;
     const fit = () => { if (ref.offsetHeight) im.style.height = ref.offsetHeight + "px"; };
     fit(); if (!ref.complete) ref.addEventListener("load", fit, { once: true });
