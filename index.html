@@ -1268,7 +1268,7 @@ function artHTML(item, opts = {}) {
   if (item.svg) { const k = ++artSeq; return item.svg.replace(/id="([\w-]+)"/g, `id="$1_${k}"`).replace(/url\(#([\w-]+)\)/g, `url(#$1_${k})`); }
   const fit = item.fit ? ` style="object-fit:${item.fit}"` : "";
   if (item.video) return `<video src="${item.video}" muted loop playsinline preload="metadata" data-auto${opts.controls ? " controls" : ""}${fit}></video>`;
-  if (item.image) return `<img src="${item.image}" alt="${(item.alt || item.caption || "").replace(/<br\s*\/?>/g, " ").replace(/<[^>]*>/g, " ").replace(/"/g, "&quot;").replace(/\s+/g, " ").trim()}" loading="lazy" draggable="false"${fit}>`;
+  if (item.image) return `<img src="${item.image}" alt="${(item.alt || item.caption || "").replace(/<br\s*\/?>/g, " ").replace(/<[^>]*>/g, " ").replace(/"/g, "&quot;").replace(/\s+/g, " ").trim()}" loading="${opts.eager ? "eager" : "lazy"}" draggable="false"${fit}>`;
   const fn = ART[item.art]; if (!fn) return "";
   const k = ++artSeq;
   return fn().replace(/id="([\w-]+)"/g, `id="$1_${k}"`).replace(/url\(#([\w-]+)\)/g, `url(#$1_${k})`);
@@ -3779,8 +3779,8 @@ function cardHTML(p) {
   const media = p.quote
     ? `<blockquote class="bcard-quote">“${p.quote.text}”${p.quote.cite ? `<cite>${p.quote.cite}</cite>` : ""}</blockquote>`
     : p.cover ? (p.coverRatio === "auto"
-        ? `<div class="bcard-media is-auto">${artHTML(p.cover)}</div>`          // natural shape, very tall images cropped from the bottom
-        : `<div class="bcard-media" style="aspect-ratio:${p.coverRatio || "3 / 2"}">${artHTML(p.cover)}</div>`) : "";
+        ? `<div class="bcard-media is-auto">${artHTML(p.cover, { eager: true })}</div>`          // natural shape, very tall images cropped from the bottom
+        : `<div class="bcard-media" style="aspect-ratio:${p.coverRatio || "3 / 2"}">${artHTML(p.cover, { eager: true })}</div>`) : "";
   return `<article class="bcard bcard--${p.category}${p.cover || p.quote ? "" : " no-media"}" tabindex="0" data-id="${p.id}" aria-label="${p.title}">
     ${media}
     <div class="bcard-body">
@@ -3805,6 +3805,19 @@ function renderBlog() {
     const target = single ? cols[0] : cols.reduce((a, c) => c.offsetHeight < a.offsetHeight ? c : a);   // shortest column
     target.insertAdjacentHTML("beforeend", cardHTML(p).replace('class="bcard ', `class="bcard${p === posts[0] ? " is-lead" : ""} `));
   });
+  // Cards are placed into the shortest column; as cover images finish loading the heights change,
+  // so the cards are re-packed (in the same newest-first order) each time one loads.
+  const cards = [...blogCols.querySelectorAll(".bcard")].sort((a, b) => posts.findIndex(p => p.id === a.dataset.id) - posts.findIndex(p => p.id === b.dataset.id));
+  let raf = 0;
+  const pack = () => {
+    raf = 0;
+    if (single) return;
+    const h = cols.map(() => 0);
+    cards.forEach(c => c.remove());
+    cards.forEach(c => { const i = h.indexOf(Math.min(...h)); cols[i].appendChild(c); h[i] = cols[i].offsetHeight; });
+  };
+  const repack = () => { if (!raf) raf = requestAnimationFrame(pack); };
+  blogCols.querySelectorAll(".bcard img").forEach(im => { if (!im.complete) { im.addEventListener("load", repack, { once: true }); im.addEventListener("error", repack); } });
   blogCols.querySelectorAll(".bcard").forEach(c => {
     const open = () => openPost(c.dataset.id);
     c.addEventListener("click", open);
