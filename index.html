@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2.25' y='2.25' width='27.5' height='27.5' fill='none' stroke='%23F18430' stroke-width='3.5'/%3E%3Crect x='7.5' y='7.5' width='17' height='17' fill='none' stroke='%23F18430' stroke-width='1.5'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #F4F2EF;
@@ -18,13 +18,13 @@
     --accent: #F18430;
     --menu-bg: #FFFFFF;
     --shadow: 0 30px 60px -30px rgba(40,28,15,.45);
-    --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --sans: "Inter", "Noto Sans SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --card: #F9F8F5;
     --wash: #EEECE8;   /* soft neutral white-out over background projects */
     --gutter: clamp(1.5rem, 4vw, 3.5rem);
     /* Featured card width: shrinks before it can crowd the intro column */
     --cw: clamp(360px, calc(100vw - 50rem), 640px);
-    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;   /* display font (headlines + name) */
+    --serif: "Source Serif 4", "Noto Serif SC", Georgia, "Times New Roman", serif;   /* display font (headlines + name) */
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -90,6 +90,9 @@
   .nav-item:hover .nav-trigger svg, .nav-item.is-open .nav-trigger svg { color: var(--accent); }
   .nav-trigger svg { width: 12px; height: 12px; transition: transform .3s cubic-bezier(.2,.7,.2,1), color .3s; }
   .nav-item { position: relative; }
+  /* EN / 中文 switch */
+  .lang-toggle { appearance: none; border: 0; background-color: transparent; font: inherit; cursor: pointer; }
+  .lang-toggle::before { content: ""; position: absolute; left: -.9rem; top: 50%; width: 1px; height: .9em; transform: translateY(-50%); background: var(--rule-soft, #ddd); }
   .nav-item:hover .nav-trigger svg, .nav-item:focus-within .nav-trigger svg, .nav-item.is-open .nav-trigger svg { transform: rotate(180deg); }
   .menu {
     position: absolute; top: calc(100% + .6rem); left: -.85rem;
@@ -934,6 +937,7 @@
         <li><a href="#blogs"><span>Blogs</span><svg class="menu-ext" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></li>
       </ul>
     </div>
+    <button class="nav-link lang-toggle" type="button" id="langToggle" lang="zh-CN" aria-label="切换到中文">中文</button>
   </nav>
 </header>
 
@@ -1061,6 +1065,31 @@
 </div>
 
 <script>
+/* ============================================================
+   LANGUAGE — English by default, Simplified Chinese with ?lang=zh
+   (or after choosing 中文, which is remembered in this browser).
+   T("English", "中文") picks the right one; Chinese text for the main
+   pages lives in ZH below and falls back to English when missing.
+   ============================================================ */
+const LANG = (() => {
+  const q = new URLSearchParams(location.search).get("lang");
+  if (q === "zh" || q === "en") { try { localStorage.setItem("lang", q); } catch (e) {} return q; }
+  try { return localStorage.getItem("lang") === "zh" ? "zh" : "en"; } catch (e) { return "en"; }
+})();
+const ZH = LANG === "zh";
+const T = (en, zh) => (ZH && zh != null ? zh : en);
+function mergeInto(target, over) {          // copy translated fields onto the English data (null = keep English)
+  Object.keys(over).forEach(k => {
+    const v = over[k];
+    if (v == null) return;
+    if (typeof v === "object" && target[k] && typeof target[k] === "object") mergeInto(target[k], v);
+    else target[k] = v;
+  });
+}
+function setLang(l) {
+  try { localStorage.setItem("lang", l); } catch (e) {}
+  location.href = location.pathname + (l === "zh" ? "?lang=zh" : "?lang=en") + location.hash;
+}
 /* ============================================================
    CONTENT — edit this array to change projects.
    Set `image` to a path/URL (e.g. "img/hearth.jpg") to replace
@@ -1865,9 +1894,426 @@ function renderAbout() {
   renderDetail({
     key: "about", main: true, kicker: ABOUT.kicker, title: ABOUT.title, summary: ABOUT.summary, meta: ABOUT.meta,
     back: null, sections: ABOUT.sections,
-    next: { kicker: "Next", label: "PROJECTS - Selected work",
-            item: { href: "#", subtitle: "Digital interpretation for cultural heritage & education", image: "media/portfolio/project1_highlight3.png", art: "hearth" }, cta: "View projects" }
+    next: { kicker: T("Next", "下一页"), label: T("PROJECTS - Selected work", "项目 - 精选作品"),
+            item: { href: "#", subtitle: T("Digital interpretation for cultural heritage & education", "面向文化遗产与教育的数字阐释"), image: "media/portfolio/project1_highlight3.png", art: "hearth" }, cta: T("View projects", "查看项目") }
   });
+}
+
+/* ---------- Chinese (中文) text for the main pages: same shape as the English data above ---------- */
+const ZH_TEXT = {
+ "PROJECTS": [
+  {
+   "title": "3D 扫描壁炉",
+   "subtitle": "3D 数字化与交互模型"
+  },
+  {
+   "title": "蒙特克莱尔历史地图",
+   "subtitle": "交互地图与档案研究"
+  },
+  {
+   "title": "定光佛（互动丝绸之路）",
+   "subtitle": "多感官展览与 3D 数字化"
+  },
+  {
+   "title": "药剂调配实验室（无畏号博物馆）",
+   "subtitle": "多感官展览与数字体验设计"
+  }
+ ],
+ "CASES": [
+  {
+   "title": "从历史空间到交互式 3D 体验",
+   "subtitle": "3D 数字化工作流程",
+   "summary": "以高斯泼溅（Gaussian splatting）技术扫描一座历史壁炉，并将其转化为可在网站上随时随地探索的交互式 3D 模型。",
+   "meta": [
+    [
+     "角色",
+     "3D 扫描、后期制作、网站开发、工作流程设计"
+    ],
+    [
+     "背景",
+     "蒙特克莱尔历史中心（Montclair History Center）"
+    ],
+    [
+     "工具",
+     "单反相机、Postshot、SuperSplat、Claude"
+    ]
+   ]
+  },
+  {
+   "title": "设计无障碍的多感官博物馆体验",
+   "subtitle": "展览开发",
+   "summary": "为无畏号博物馆（Intrepid Museum）医务区（Sick Bay）药房设计的一场融入无障碍理念的多感官展览。",
+   "meta": [
+    [
+     "角色",
+     "展览设计、UX 设计、研究、项目协调"
+    ],
+    [
+     "背景",
+     "无畏号博物馆（Intrepid Museum）、NYU Ability Project"
+    ],
+    [
+     "工具",
+     "Figma"
+    ]
+   ]
+  }
+ ],
+ "SECTION_NAMES": [
+  "背景",
+  "目标",
+  "研究",
+  "创作过程",
+  "亮点",
+  "项目页面",
+  "成果",
+  "反思"
+ ],
+ "CASE_DETAILS": [
+  [
+   {
+    "text": "蒙特克莱尔历史中心（Montclair History Center）的历史壁炉是这处遗址物质历史的一部分，但它的实际位置与形态限制了参观者探索的方式。本项目尝试以 3D 技术对这一空间进行数字化保存，同时为观众创造一种更具互动性的方式去接触它的历史。"
+   },
+   {
+    "text": "目标是打造一个将 3D 记录与历史阐释相结合的无障碍数字体验。我希望观众看到的不只是一张静态照片，而是能亲自探索这个空间，同时了解它的历史背景。"
+   },
+   {
+    "text": "我研究了壁炉的物理与历史背景，以确定哪些细节最值得在数字体验中呈现。我还探索了 3D 高斯泼溅这一捕捉复杂建筑空间的方法，并考虑了分辨率、导航方式和设备性能会如何影响体验的可及性。"
+   },
+   {
+    "images": [
+     {
+      "caption": "现场拍摄的原始素材（部分）。"
+     },
+     {
+      "caption": "在 Postshot 中处理扫描。"
+     },
+     {
+      "caption": "在 SuperSplat 中清理扫描（建筑外部全景）。"
+     },
+     {
+      "caption": "清理多余的泼溅点以优化文件大小。"
+     },
+     {
+      "caption": "用校准工具记录各故事节点的相机位置。"
+     },
+     {
+      "caption": "构思交互体验。"
+     }
+    ],
+    "text": "我使用 Nikon D850 在现场拍摄壁炉，并用 Postshot 将素材（900 多张图片）处理成 3D 高斯泼溅模型，随后在 SuperSplat 中清理扫描，确保文件大小适配各类设备。之后我请教了相关的历史背景，并围绕七个故事节点构思网站体验：通过相机定位与页面滚动，引导观众浏览模型的不同区域，并将每个视角与阐释文字联系起来。"
+   },
+   {
+    "text": "最终的体验将交互式 3D 模型与滚动式叙事相结合，用户可以从不同角度环绕、浏览和放大壁炉。我还开发了一个相机校准工具，并加入响应式控制，使体验在桌面端和移动端都能访问。（更多内容请见<a class=\"text-link\" href=\"#project-01\">项目页面</a>。）"
+   },
+   null,
+   {
+    "text": "项目最终形成了一个公开访问的网站，包含交互式 3D 模型、七个阐释性故事节点及相关历史内容。它展示了新兴 3D 技术如何将历史场所的体验延伸到博物馆之外。我还整理了一份项目文档，详细记录目标、背景、工作流程和技术规格，以支持未来的维护与可持续发展。"
+   },
+   {
+    "text": "这个项目让我理解了高斯泼溅用于文化遗产阐释的可能与局限。模型仍有表面缺口、边缘羽化等瑕疵，但整个过程让我看到 3D 采集、阐释与网页设计如何协同，让实体遗产更易接触、更可探索。"
+   }
+  ],
+  [
+   {
+    "text": "无畏号博物馆（Intrepid Museum）的药房是一个狭小的历史空间，讲述了舰上医疗与药剂调配的故事。我们的团队探索了交互式与多感官的阐释方式如何帮助参观者更好地理解这个空间、其中的工具以及制药的过程。"
+   },
+   {
+    "text": "我们希望参观者了解药物如何调配、药品如何储存与准备，以及 无畏号舰上的药房实践与他们今天的用药经验有何联系。这一体验也希望通过交互与多感官活动，让参观者直接接触工具、配方和技艺。"
+   },
+   {
+    "text": "我们考察了药房的物理限制，包括狭窄的空间、有限的观看区域、声音外溢以及材料的耐久性。我们也从一开始就考虑无障碍，思考触觉、声音、气味和数字交互如何为同一内容提供多种获取方式。"
+   },
+   {
+    "images": [
+     {
+      "caption": "各交互体验在平面图上如何协同。"
+     },
+     {
+      "caption": "初步构思收到的反馈。"
+     },
+     {
+      "caption": "交互触摸屏的网站地图。"
+     },
+     {
+      "caption": "交互触摸屏的低保真原型。"
+     }
+    ],
+    "text": "我们经过三轮头脑风暴来发展想法，把交互概念与其他感官元素结合，并根据反馈不断完善。最终形成三个相互关联的部分：交互式配方制作触摸屏、气味瓶和触觉抽屉，并配有无障碍标签与说明。交互触摸屏的开发包括网站地图、低保真原型和高保真原型。"
+   },
+   {
+    "text": "我参与开发了交互式配方制作体验及其高保真原型，参观者可以通过拖放混合的活动，按照一份历史药方完成调配。我还负责无障碍功能，包括屏幕阅读器兼容、音频描述、触觉反馈、触觉覆盖层、盲文和大字印刷材料。（更多内容请见<a class=\"text-link\" href=\"#project-04\">项目页面</a>。）"
+   },
+   null,
+   {
+    "text": "项目最终产出了触摸屏体验、气味交互、标签和实体组件的低保真与高保真原型。无障碍并不是事后添加的，而是贯穿整个设计：视觉、触觉、听觉和嗅觉等多种交互方式都融入其中。"
+   },
+   {
+    "text": "这个项目让我认识到，无障碍阐释不只是为现有体验加上辅助设施，而是从一开始就为有不同需求和偏好的人着想。为一个狭小的历史空间做设计，也促使我思考物理限制、感官交互、数字界面和无障碍如何共同营造更具包容性的博物馆体验。"
+   }
+  ]
+ ],
+ "PROJECT_DETAILS": [
+  {
+   "summary": "以高斯泼溅（Gaussian splatting）技术扫描一座历史壁炉，并将其转化为可在网站上随时随地探索的交互式 3D 模型。",
+   "meta": [
+    [
+     "角色",
+     "3D 扫描、后期制作、网站开发、工作流程设计"
+    ],
+    [
+     "背景",
+     "蒙特克莱尔历史中心（Montclair History Center）"
+    ],
+    [
+     "工具",
+     "单反相机、Postshot、SuperSplat、Claude"
+    ]
+   ],
+   "overview": {
+    "text": [
+     "3D 扫描壁炉项目利用 3D 高斯泼溅技术对历史壁炉进行数字化采集，最终形成一个包含交互式 3D 模型与阐释文字的网站。观众可以一边探索 3D 模型，一边了解壁炉的历史与背景。项目的目标是让地方历史对公众更具互动性、更易接触。"
+    ]
+   },
+   "demo": {
+    "text": "滚动页面即可跟随导览，也可以使用控件随意探索 3D 模型。"
+   },
+   "highlights": {
+    "items": [
+     {
+      "caption": "分屏布局：左侧为文字，右侧为 3D 模型。"
+     },
+     {
+      "caption": "在文字段落之间滚动时，相机视角会随之定位或重新定位。"
+     },
+     {
+      "caption": "3D 扫描壁炉的特写。"
+     },
+     {
+      "caption": "控制面板提供导航说明，观众也可以自选画质。"
+     }
+    ]
+   }
+  },
+  {
+   "summary": "一个交互式网站地图，将历史地图集、照片和故事叠加在今天的街道之上。",
+   "meta": [
+    [
+     "角色",
+     "地理配准、网站开发、研究、工作流程设计"
+    ],
+    [
+     "背景",
+     "蒙特克莱尔历史中心（Montclair History Center）"
+    ],
+    [
+     "工具",
+     "Map Warper、Claude"
+    ]
+   ],
+   "overview": {
+    "text": [
+     "交互式蒙特克莱尔历史地图利用地理配准，将 1906 年的 蒙特克莱尔历史地图集与现代地图对齐，最终形成一个包含历史地图叠加层和阐释性标记点的网站。观众可以调整历史地图叠加层的透明度、单独开关各幅图版，并通过标记点查看更多信息；管理员可以编辑现有标记点或添加新的标记点。项目的目标是让地方历史对公众更具互动性、更易接触。"
+    ]
+   },
+   "demo": {
+    "text": "使用控制面板调整历史图版与叠加层，点击标记点查看更多。管理员可以编辑或添加标记点。"
+   },
+   "highlights": {
+    "items": [
+     {
+      "caption": "通过直观的拖动与地图交互。"
+     },
+     {
+      "caption": "滑块可以调整历史地图叠加层的不透明度。"
+     },
+     {
+      "caption": "点击标记点会显示该地点的详细介绍、链接和图片。"
+     },
+     {
+      "caption": "以管理员身份登录后，可以修改标记点。"
+     }
+    ]
+   }
+  },
+  {
+   "summary": "一个融合实体与数字元素的多感官装置，展示丝绸之路沿线四个地区具有代表性的文化文物。",
+   "meta": [
+    [
+     "角色",
+     "展览设计、3D 扫描、后期制作、研究、项目管理"
+    ],
+    [
+     "背景",
+     "本科毕业项目，纽约大学整合设计与媒体（Integrated Design & Media）"
+    ],
+    [
+     "工具",
+     "单反相机、RealityScan、Blender"
+    ]
+   ],
+   "overview": {
+    "text": [
+     "北魏（386–534）的定光佛像现藏于大都会艺术博物馆（The Met）。我以摄影测量技术对其进行 3D 扫描，并渲染成带有点云动画的视频，作为<a class=\"text-link\" href=\"#blogs/interactive-silk-road\">互动丝绸之路（Interactive Silk Road）</a>项目的一部分。"
+    ]
+   },
+   "demo": {
+    "text": "点击<a class=\"text-link\" href=\"https://drive.google.com/file/d/1a925enCNAt6Uz5VACmHjJpNxgQV055oT/view?usp=sharing\" target=\"_blank\" rel=\"noopener\">这里</a>查看完整的项目展示。点击<a class=\"text-link\" href=\"https://sketchfab.com/3d-models/buddha-dipankara-01364689bc554d149418152e339e5024\" target=\"_blank\" rel=\"noopener\">这里</a>在 Sketchfab 上与 3D 模型互动。"
+   },
+   "highlights": {
+    "items": [
+     {
+      "caption": "3D 模型左前方四分之三视角的渲染细节。"
+     },
+     {
+      "caption": "3D 模型右后方四分之三视角的渲染细节。"
+     },
+     {
+      "caption": "渲染视频中的溶解效果。"
+     },
+     {
+      "caption": "互动丝绸之路装置全貌。"
+     }
+    ]
+   }
+  },
+  {
+   "summary": "为无畏号博物馆（Intrepid Museum）医务区（Sick Bay）药房设计的一场融入无障碍理念的多感官展览。",
+   "meta": [
+    [
+     "角色",
+     "展览设计、UX 设计、研究、项目协调"
+    ],
+    [
+     "背景",
+     "无畏号博物馆（Intrepid Museum）、NYU Ability Project"
+    ],
+    [
+     "工具",
+     "Figma"
+    ]
+   ],
+   "overview": {
+    "text": [
+     "药剂调配实验室是 无畏号博物馆（Intrepid Museum）药房项目中的交互式触摸屏体验。这是一个协作项目，旨在设计无障碍、可交互的参观体验。整体体验由交互触摸屏、气味瓶、触觉抽屉以及标签和说明组成。"
+    ]
+   },
+   "demo": {
+    "text": "点击<a class=\"text-link\" href=\"https://drive.google.com/file/d/1h3a4tucMJUR_Y4hCu9Sn5L_VBHNoyMuX/view?usp=sharing\" target=\"_blank\" rel=\"noopener\">这里</a>查看完整的项目展示。点击<a class=\"text-link\" href=\"https://www.figma.com/proto/w1bJnrbNIW5Rrc7QGsLpii/Activity-1--Make-a-recipe--reader-rail-?node-id=80-455&amp;p=f&amp;t=5FhUCBrVdsfH4WVO-1&amp;scaling=scale-down&amp;content-scaling=fixed&amp;page-id=79%3A34&amp;starting-point-node-id=80%3A455\" target=\"_blank\" rel=\"noopener\">这里</a>在 Figma 上体验交互触摸屏。点击<a class=\"text-link\" href=\"https://sketchfab.com/3d-models/pharmacy-scent-demo-698f9f8a1a71485abd2adeaba1315a06\" target=\"_blank\" rel=\"noopener\">这里</a>在 Sketchfab 上查看气味瓶。"
+   },
+   "highlights": {
+    "items": [
+     {
+      "caption": "药剂调配实验室的首页。"
+     },
+     {
+      "caption": "药剂调配实验室的“选择配方”页面。"
+     },
+     {
+      "caption": "配方特写。"
+     },
+     {
+      "caption": "调配过程特写。"
+     }
+    ]
+   }
+  }
+ ],
+ "ABOUT": {
+  "kicker": "关于",
+  "title": "关于",
+  "summary": "我是 Evaine Sun /iːˈveɪn sʌn/，一名现居纽约的设计师与开发者，专注于文化遗产与教育领域的数字阐释。",
+  "sections": [
+   {
+    "name": "简介",
+    "text": [
+     "我创作帮助人们与文化、历史和地方建立联系的数字体验，包括 3D 数字化、交互式网站和数字展览。",
+     "我关注实体与数字空间之间的创意体验。我的工作将研究、设计与技术结合在一起，聚焦于阐释：让文化遗产更易接触、更吸引人，也更有意义。"
+    ]
+   },
+   {
+    "name": "探险",
+    "rows": [
+     {
+      "org": "编辑与数字内容实习生",
+      "when": "09/2026 – 至今",
+      "text": "参与喜马拉雅艺术与文化遗产相关的数字阐释和内容项目，支持博物馆内容在各数字平台上的开发与呈现。",
+      "title": "鲁宾喜马拉雅艺术博物馆（Rubin Museum of Himalayan Art）"
+     },
+     {
+      "org": "实习生：3D 数字化、社交媒体、行政协助",
+      "text": "独立开发数字阐释项目，包括 3D 数字化和交互式网页体验，同时支持标识、研究和博物馆日常运营。",
+      "title": "蒙特克莱尔历史中心（Montclair History Center）"
+     },
+     {
+      "org": "前台助理",
+      "text": "作为学生和访客的主要联络人，提供专业的服务，并支持辅导中心的日常运营。",
+      "title": "纽约大学坦登工程学院理工辅导中心（NYU Tandon Polytechnic Tutoring Center）"
+     },
+     {
+      "title": "上海纽约大学暑期沉浸项目",
+      "org": "项目助理",
+      "text": "为国际学生策划并协调每周的文化、社交与语言沉浸活动及外出考察，支持活动后勤与学生参与。"
+     },
+     {
+      "org": "实习生：网站开发、平面设计",
+      "text": "为一家专注教育的非营利组织完成网站改版，并制作海报、宣传册等数字与印刷传播材料。",
+      "title": "田字格公益"
+     }
+    ]
+   },
+   {
+    "name": "教育",
+    "rows": [
+     {
+      "when": "硕士与学士，2021 – 2026",
+      "text": "本硕连读，专注数字文化遗产方向，辅修人类学。",
+      "title": "纽约大学，坦登工程学院（New York University, Tandon School of Engineering）",
+      "org": "整合设计与媒体（Integrated Design &amp; Media）"
+     }
+    ]
+   },
+   {
+    "name": "技能与工具",
+    "cols": [
+     {
+      "title": "数字与设计",
+      "items": [
+       "3D 数字化与扫描",
+       "展览与体验设计",
+       "数字资产与网站内容管理",
+       "多媒体制作",
+       "数字营销与社交媒体",
+       "原型制作与装置"
+      ]
+     },
+     {
+      "title": "其他",
+      "items": [
+       "项目管理与文档",
+       "活动管理与后勤",
+       "工作流程开发",
+       "跨部门协调"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "工作之外",
+    "text": "工作之余，我会去世界各地旅行，也会开发其他主题和媒介的个人项目。点击<a class=\"text-link\" href=\"#photos\">这里</a>查看我的摄影作品，点击<a class=\"text-link\" href=\"#blogs\">这里</a>查看我的博客。"
+   },
+   {
+    "name": "联系",
+    "text": "我很乐意聊聊文化遗产、创意项目和新的合作。",
+    "html": "<div class=\"link-row\">\n        <a class=\"text-link\" href=\"mailto:evainesun@gmail.com\">邮箱</a>\n        <a class=\"text-link\" href=\"https://www.linkedin.com/in/evainesun/\" target=\"_blank\" rel=\"noopener\">LinkedIn</a></div>"
+   }
+  ]
+ }
+};
+if (ZH) {
+  mergeInto(PROJECTS, ZH_TEXT.PROJECTS); mergeInto(CASES, ZH_TEXT.CASES);
+  mergeInto(SECTION_NAMES, ZH_TEXT.SECTION_NAMES); mergeInto(CASE_DETAILS, ZH_TEXT.CASE_DETAILS);
+  mergeInto(PROJECT_DETAILS, ZH_TEXT.PROJECT_DETAILS); mergeInto(ABOUT, ZH_TEXT.ABOUT);
 }
 
 /* ---------- Build the two wheels ---------- */
@@ -1876,8 +2322,8 @@ const casesEl = document.getElementById("cases");
 const detailEl = document.getElementById("csd");
 const headerEl = document.querySelector(".site-header");
 
-const projectsWheel = createWheel({ root: homeEl, items: PROJECTS, prefix: "PROJECT", cta: "View project", loop: true });
-const casesWheel = createWheel({ root: casesEl, items: CASES, prefix: "CASE STUDY", cta: "View case study", loop: false });
+const projectsWheel = createWheel({ root: homeEl, items: PROJECTS, prefix: T("PROJECT", "项目"), cta: T("View project", "查看项目"), loop: true });
+const casesWheel = createWheel({ root: casesEl, items: CASES, prefix: T("CASE STUDY", "案例研究"), cta: T("View case study", "查看案例研究"), loop: false });
 
 /* ---------- Case study detail page: sticky intro + scroll-linked sections ---------- */
 const secList = detailEl.querySelector(".cs-list");
@@ -1898,7 +2344,7 @@ function galleryHTML(sec) {
     </div>` : "";
   const hasCaps = imgs.some(im => im.caption);
   const capEl = hasCaps ? `<span class="slide-cap">${imgs[0].caption || ""}</span>` : "";
-  const cta = sec.link ? `<a class="cs-link-cta" href="${sec.link}" target="_blank" rel="noopener"><span>${sec.cta || "View demo"}</span>${arrow}</a>` : "";
+  const cta = sec.link ? `<a class="cs-link-cta" href="${sec.link}" target="_blank" rel="noopener"><span>${sec.cta || T("View demo", "查看演示")}</span>${arrow}</a>` : "";
   return `<div class="cs-media cs-focus" data-caps='${hasCaps ? JSON.stringify(imgs.map(im => im.caption || "")).replace(/'/g, "&#39;") : ""}'><div class="cs-art">${slides}</div>${capEl}${cta}${nav}</div>`;
 }
 function wireZoom(media, items) {
@@ -2024,7 +2470,7 @@ function renderDetail(d) {
     el.className = `cs cs--${kind}`;
     const label = `
       <div class="cs-label">
-        <span class="plabel-title"><span>SECTION ${pad(i+1)} - ${sec.name}</span></span>
+        <span class="plabel-title"><span>${T("SECTION", "章节")} ${pad(i+1)} - ${sec.name}</span></span>
       </div>`;
     const paras = t => (Array.isArray(t) ? t : [t]).map(p => `<p>${p}</p>`).join("");
     if (kind === "list") {
@@ -2053,7 +2499,7 @@ function renderDetail(d) {
       // links a project to its case study, or a case study to its project page
       const toProject = sec.projectIndex !== undefined;
       const c = toProject ? PROJECTS[sec.projectIndex] : CASES[sec.caseIndex];
-      const cta = toProject ? "View project" : "View case study";
+      const cta = toProject ? T("View project", "查看项目") : T("View case study", "查看案例研究");
       el.innerHTML = `${label}
         <a class="cs-media cs-link cs-focus" href="${c.href}" aria-label="${cta}: ${c.title}">
           <div class="cs-art">${artHTML(c)}</div>
@@ -2088,27 +2534,27 @@ function renderDetail(d) {
 function renderCase(ci) {
   const c = CASES[ci], ni = (ci + 1) % CASES.length;
   renderDetail({
-    key: `case${ci}`, kicker: `Case Study ${pad(ci + 1)}`, title: c.title, summary: c.summary, meta: c.meta,
-    back: { href: "#case-studies", label: "Case Studies" },
+    key: `case${ci}`, kicker: `${T("Case Study", "案例研究")} ${pad(ci + 1)}`, title: c.title, summary: c.summary, meta: c.meta,
+    back: { href: "#case-studies", label: T("Case Studies", "案例研究") },
     sections: (CASE_DETAILS[ci] || []).map((sec, i) => ({ ...sec, name: SECTION_NAMES[i] || sec.title, kind: sec.kind || ((sec.images || sec.art || sec.image) ? "media" : "text") })),
-    next: { kicker: "Next case study", label: `CASE STUDY ${pad(ni + 1)} - ${CASES[ni].title}`, item: CASES[ni], cta: "View case study" }
+    next: { kicker: T("Next case study", "下一个案例研究"), label: `${T("CASE STUDY", "案例研究")} ${pad(ni + 1)} - ${CASES[ni].title}`, item: CASES[ni], cta: T("View case study", "查看案例研究") }
   });
 }
 
 function renderProject(pi) {
   const p = PROJECTS[pi], d = PROJECT_DETAILS[pi], ni = (pi + 1) % PROJECTS.length;
   const sections = [
-    { name: "Overview", kind: "text", subtitle: d.overview.subtitle, text: d.overview.text },
-    { name: "Demo", kind: "media", ...d.demo },
-    { name: "Highlights", kind: "grid", subtitle: d.highlights.subtitle, items: d.highlights.items }
+    { name: T("Overview", "概述"), kind: "text", subtitle: d.overview.subtitle, text: d.overview.text },
+    { name: T("Demo", "演示"), kind: "media", ...d.demo },
+    { name: T("Highlights", "亮点"), kind: "grid", subtitle: d.highlights.subtitle, items: d.highlights.items }
   ];
   if (d.caseStudy !== null && d.caseStudy !== undefined && CASES[d.caseStudy])
-    sections.push({ name: "Case Study", kind: "link", subtitle: "The full process behind this project", caseIndex: d.caseStudy });
+    sections.push({ name: T("Case Study", "案例研究"), kind: "link", subtitle: T("The full process behind this project", "项目背后的完整过程"), caseIndex: d.caseStudy });
   renderDetail({
-    key: `proj${pi}`, kicker: `Project ${pad(pi + 1)}`, title: p.title, summary: d.summary, meta: d.meta,
-    back: { href: "#", label: "Projects" },
+    key: `proj${pi}`, kicker: `${T("Project", "项目")} ${pad(pi + 1)}`, title: p.title, summary: d.summary, meta: d.meta,
+    back: { href: "#", label: T("Projects", "项目") },
     sections,
-    next: { kicker: "Next project", label: `PROJECT ${pad(ni + 1)} - ${PROJECTS[ni].title}`, item: PROJECTS[ni], cta: "View project" }
+    next: { kicker: T("Next project", "下一个项目"), label: `${T("PROJECT", "项目")} ${pad(ni + 1)} - ${PROJECTS[ni].title}`, item: PROJECTS[ni], cta: T("View project", "查看项目") }
   });
 }
 
@@ -2180,19 +2626,19 @@ addEventListener("scroll", () => {
 const soonEl = document.getElementById("soon");
 const MAINS = [homeEl, casesEl, detailEl, soonEl, document.getElementById("gallery"), document.getElementById("blog")];
 const SOON = {
-  photos: { title: "Photos", text: "This page is still being developed. Please check back soon." },
-  blogs:  { title: "Blogs",         text: "The blog is still being developed. Please check back soon." }
+  photos: { title: T("Photos", "摄影"), text: T("This page is still being developed. Please check back soon.", "此页面仍在建设中，敬请期待。") },
+  blogs:  { title: T("Blogs", "博客"), text: T("The blog is still being developed. Please check back soon.", "博客仍在建设中，敬请期待。") }
 };
 function pageFor(name) {
-  if (name === "home")  return { el: homeEl,  nav: "home",  title: "Evaine Sun — Digital Interpretation for Cultural Heritage and Education", enter: () => projectsWheel.enter() };
-  if (name === "cases") return { el: casesEl, nav: "cases", title: "Case Studies — Evaine Sun", enter: () => casesWheel.enter() };
-  if (name === "photos") return { el: document.getElementById("gallery"), nav: "none", title: "Photos — Evaine Sun", enter: () => { galGrid.innerHTML = ""; renderGallery(); } };
-  if (name === "blogs") return { el: document.getElementById("blog"), nav: "none", title: "Blogs — Evaine Sun", enter: () => { const dp = postFromHash(); if (dp) blogCat = BLOG_CATS.findIndex(c => c.key === dp.category); blogW = innerWidth; blogCols.innerHTML = ""; renderBlog(); if (dp) openPost(dp.id); } };
+  if (name === "home")  return { el: homeEl,  nav: "home",  title: T("Evaine Sun — Digital Interpretation for Cultural Heritage and Education", "Evaine Sun — 面向文化遗产与教育的数字阐释"), enter: () => projectsWheel.enter() };
+  if (name === "cases") return { el: casesEl, nav: "cases", title: T("Case Studies — Evaine Sun", "案例研究 — Evaine Sun"), enter: () => casesWheel.enter() };
+  if (name === "photos") return { el: document.getElementById("gallery"), nav: "none", title: T("Photos — Evaine Sun", "摄影 — Evaine Sun"), enter: () => { galGrid.innerHTML = ""; renderGallery(); } };
+  if (name === "blogs") return { el: document.getElementById("blog"), nav: "none", title: T("Blogs — Evaine Sun", "博客 — Evaine Sun"), enter: () => { const dp = postFromHash(); if (dp) blogCat = BLOG_CATS.findIndex(c => c.key === dp.category); blogW = innerWidth; blogCols.innerHTML = ""; renderBlog(); if (dp) openPost(dp.id); } };
   if (SOON[name]) return { el: soonEl, nav: "none", title: `${SOON[name].title} — Evaine Sun`, enter: () => {
     document.getElementById("soonTitle").textContent = SOON[name].title;
     document.getElementById("soonText").textContent = SOON[name].text;
   } };
-  if (name === "about") return { el: detailEl, nav: "about", title: "About — Evaine Sun", enter: () => { renderAbout(); fitIntro(); updateSections(); } };
+  if (name === "about") return { el: detailEl, nav: "about", title: T("About — Evaine Sun", "关于 — Evaine Sun"), enter: () => { renderAbout(); fitIntro(); updateSections(); } };
   if (name.startsWith("proj")) {
     const pi = Number(name.slice(4));
     return { el: detailEl, nav: "home", title: `${PROJECTS[pi].title} — Evaine Sun`, enter: () => { renderProject(pi); fitIntro(); updateSections(); } };
@@ -2250,9 +2696,9 @@ addEventListener("hashchange", route);
    Until then, placeholder photos stand in, with a smooth colour flow.
    ============================================================ */
 const GALLERY_CATS = [
-  { key: "nature",       name: "Nature",       anchors: [[150,32,30],[115,30,36],[80,42,52],[48,58,60],[28,62,58],[8,45,52],[330,22,48],[260,22,52],[215,32,58],[195,30,74]] },
-  { key: "architecture", name: "Architecture", anchors: [[30,18,86],[38,28,74],[25,40,60],[12,42,48],[0,10,38],[210,8,52],[205,20,64],[200,28,76],[45,12,80]] },
-  { key: "culture",      name: "Culture",      anchors: [[355,62,46],[18,70,52],[38,78,56],[52,70,60],[90,30,46],[160,32,38],[200,40,40],[240,30,42],[290,30,44]] }
+  { key: "nature",       name: T("Nature", "自然"),       anchors: [[150,32,30],[115,30,36],[80,42,52],[48,58,60],[28,62,58],[8,45,52],[330,22,48],[260,22,52],[215,32,58],[195,30,74]] },
+  { key: "architecture", name: T("Architecture", "建筑"), anchors: [[30,18,86],[38,28,74],[25,40,60],[12,42,48],[0,10,38],[210,8,52],[205,20,64],[200,28,76],[45,12,80]] },
+  { key: "culture",      name: T("Culture", "人文"),      anchors: [[355,62,46],[18,70,52],[38,78,56],[52,70,60],[90,30,46],[160,32,38],[200,40,40],[240,30,42],[290,30,44]] }
 ];
 const RATIOS = [[3,2],[2,3],[4,3],[16,9],[4,5],[1,1],[3,2],[5,4],[2,3],[3,2],[16,10],[3,4]];
 const PLACES = { nature: ["Hudson Valley, NY", "Acadia, ME", "Big Sur, CA", "Lake Placid, NY", "Zion, UT", "Kyoto, Japan", "Banff, Canada"],
@@ -2407,10 +2853,13 @@ const PHOTO_LIST = {
     ["Cc3_24PA.JPG", "Steam on Philadelphia Street", "", "Philadelphia, Pennsylvania, US", "11/28/2024"],
     ["Cc4_DSC_2793.JPG", "Brooklyn Out-of-focus", "", "Brooklyn, New York, US", "09/16/2024"],
     ["Cc5_23JX.JPG", "Horseshoe Gold 马蹄金 and Linzhi Gold 麟趾金", "", "The National Archaeological Site Park of Nanchang Han Dynasty Haihun Marquis 海昏侯国遗址公园, Nanchang 南昌, Jiangxi 江西, China", "06/26/2023"],
-    ["Cc6_25NZ.JPG", "The One Ring", "", "Weta Workshop, Auckland, New Zealand", "03/26/2025"],
+    ["Cc6_25NZ.JPG", "The One Ring", "", "Wētā Workshop, Auckland, New Zealand", "03/26/2025"],
     ["Cc7_23JX.JPG", "Strings of Rain", "", "Pavilion of Prince Teng 滕王阁, Nanchang 南昌, Jiangxi 江西, China", "06/25/2023"]
   ]
 };
+/* Chinese (中文) photo titles and places: [file, title, caption, location] (null = keep) */
+const ZH_PHOTOS = {"nature": [[null, "莫纳克亚山的日落", null, "美国夏威夷 · 莫纳克亚山游客中心（Maunakea Visitor Information Station）"], [null, "太空针塔的日落", null, "美国华盛顿州西雅图 · 太空针塔（Space Needle）"], [null, "莫纳克亚山的日落", null, "美国夏威夷 · 莫纳克亚山游客中心（Maunakea Visitor Information Station）"], [null, "阿卡迪亚的日落", null, "美国缅因州 · 阿卡迪亚国家公园（Acadia National Park）"], [null, "一片云", null, "中国黑龙江 · 从哈尔滨到漠河"], [null, "漂浮的森林", null, "中国黑龙江 · 从哈尔滨到漠河"], [null, "夕阳下的输电塔", null, "中国黑龙江 · 从哈尔滨到漠河"], [null, "莫纳克亚山的日落", null, "美国夏威夷 · 莫纳克亚山游客中心（Maunakea Visitor Information Station）"], [null, "大墩海的日落", null, "中国广西北海 · 大墩海"], [null, "赛里木湖的日落", null, "中国新疆博尔塔拉博乐 · 赛里木湖"], [null, "干涸的河床", null, "中国新疆 · 大海道，从哈密到吐鲁番"], [null, "阿甘点", null, "美国犹他州墨西哥帽镇（Mexican Hat） · 阿甘点（Forrest Gump Point）"], [null, "凯兹湾的日落", null, "美国田纳西州 · 大烟山国家公园（Great Smoky Mountains National Park），凯兹湾（Cades Cove）"], [null, "间歇泉群", null, "智利圣佩德罗-德阿塔卡马（San Pedro de Atacama） · 埃尔塔蒂奥间歇泉（El Tatio Geysers）"], [null, "埃尔塔蒂奥间歇泉附近的湿地", null, "智利圣佩德罗-德阿塔卡马（San Pedro de Atacama） · 埃尔塔蒂奥间歇泉（El Tatio Geysers）"], [null, "玫瑰", null, "中国浙江嘉兴"], [null, "光影中的沙丘", null, "中国内蒙古 · 腾格里沙漠"], [null, "赛里木湖的倒影", null, "中国新疆博尔塔拉博乐 · 赛里木湖"], [null, "黄、绿与蓝", null, "美国犹他州盐湖城 · 大盐湖（Great Salt Lake）"], [null, "柔和的山", null, "中国新疆博尔塔拉博乐 · 赛里木湖"], [null, "水洼里的花", null, "中国浙江嘉兴"], [null, "怒江七十二拐", null, "中国西藏昌都八宿"], [null, "怒江", null, "中国云南 · 从芒康到贡山"], [null, "山上的村庄", null, "中国云南 · 从芒康到贡山"], [null, "羊", null, "新西兰奥克兰 · 独树山（One Tree Hill）"], [null, "碧色溪流", null, "中国西藏 · 从墨脱到波密"], [null, "独库公路沿途的山", null, "中国新疆 · 独库公路，从吐鲁番到新源"], [null, "湖与岛", null, "中国浙江嘉兴海盐"], [null, "纳塔莱斯港", null, "智利纳塔莱斯港（Puerto Natales）"], [null, "湖边的潮水", null, "斯里兰卡乌达瓦拉维（Udawalawe） · 乌达瓦拉维国家公园（Udawalawe National Park）"], [null, "白崖之上", null, "英国锡福德（Seaford） · 七姐妹郊野公园（Seven Sisters Country Park）"], [null, "有点蓝有点绿", null, "美国华盛顿州 · 奥林匹克国家公园（Olympic National Park）"], [null, "钻石头步道的灯塔", null, "美国夏威夷 · 钻石头步道（Diamond Head Trail）"], [null, "趵突泉的竹子", null, "中国山东济南 · 趵突泉"], [null, "林间溪流", null, "英国斯基普顿（Skipton） · 博尔顿修道院（Bolton Abbey）"], [null, "丁达尔效应", null, "中国西藏 · 从林芝到墨脱"], [null, "蓝与绿", null, "美国华盛顿州 · 奥林匹克国家公园（Olympic National Park）"], [null, "金色浪花", null, "美国缅因州 · 阿卡迪亚国家公园（Acadia National Park），桑德海滩（Sand Beach）"], [null, "通往教堂湾的小路", null, "新西兰科罗曼德尔（Coromandel） · 教堂湾（Cathedral Cove）"], [null, "残荷", null, "美国纽约州老韦斯特伯里（Old Westbury） · 老韦斯特伯里花园（Old Westbury Gardens）"], [null, "镜中", null, "中国黑龙江 · 从黑河到五大连池"], [null, "犹他湖", null, "美国犹他州 · 犹他湖（Utah Lake）"], [null, "圣莫尼卡海滩", null, "美国加利福尼亚州洛杉矶 · 圣莫尼卡（Santa Monica）"], [null, "乌达瓦拉维水库的倒影", null, "斯里兰卡乌达瓦拉维（Udawalawe） · 乌达瓦拉维国家公园（Udawalawe National Park）"], [null, "梅里雪山", null, "中国云南迪庆德钦 · 梅里雪山"], [null, "冠头岭的灯塔", null, "中国广西北海 · 冠头岭"], [null, "火烈鸟", null, "智利圣佩德罗-德阿塔卡马（San Pedro de Atacama） · 埃尔塔蒂奥间歇泉（El Tatio Geysers）"], [null, "碎浪", null, "美国华盛顿州 · 奥林匹克国家公园（Olympic National Park）"], [null, "夕阳下层叠的山", null, "中国宁夏银川"], [null, "窗中春色", null, "中国江苏苏州 · 拙政园"], [null, "落花", null, "美国纽约州布鲁克林"]], "architecture": [[null, "精致的柱子", null, "中国浙江金华 · 横店影视城"], [null, "光、影与柱", null, "中国浙江金华 · 横店影视城"], [null, "仰望鸡鸣阁", null, "中国浙江金华 · 鸡鸣阁"], [null, "鸡鸣阁层叠的桥与廊", null, "中国浙江金华 · 鸡鸣阁"], [null, "漂浮的宫殿", null, "中国江西婺源 · 婺女洲"], [null, "宿舍窗外的车流", null, "中国上海"], [null, "西雅图夜景", null, "美国华盛顿州西雅图 · 太空针塔（Space Needle）"], [null, "布鲁克林–皇后区高速公路", null, "美国纽约州布鲁克林"], [null, "门中门中门", null, "中国浙江金华 · 横店影视城"], [null, "风的形状", null, "中国浙江金华 · 横店影视城"], [null, "客家圆楼内部", null, "中国福建龙岩 · 永定土楼"], [null, "金顶红墙", null, "中国浙江金华 · 横店影视城"], [null, "脊兽", null, "中国北京 · 故宫"], [null, "角楼", null, "中国北京 · 故宫"], [null, "汉白玉栏杆", null, "中国北京 · 故宫"], [null, "金顶", null, "中国河南洛阳 · 老君山"], [null, "东极阁的飞檐", null, "中国黑龙江抚远 · 东极阁"], [null, "五台山的屋顶", null, "中国山西忻州 · 五台山"], [null, "霍格沃茨与霍格莫德", null, "中国北京 · 环球影城"], [null, "波特兰海角灯塔", null, "美国缅因州波特兰 · 波特兰海角灯塔（Portland Head Light）"], [null, "利兹市中心", null, "英国利兹"], [null, "寄宿家庭窗外的蓝天", null, "秘鲁库斯科（Cusco）"], [null, "拱门下的教堂", null, "秘鲁库斯科（Cusco） · 库斯科武器广场（Plaza de Armas de Cusco）"], [null, "雨中的科里坎查", null, "秘鲁库斯科（Cusco） · 科里坎查（Qorikancha）"], [null, "马拉斯盐田", null, "秘鲁库斯科（Cusco） · 马拉斯盐田（Salineras de Maras）"], [null, "西夏王陵博物馆", null, "中国宁夏银川 · 西夏王陵"], [null, "马丘比丘的一扇窗", null, "秘鲁库斯科（Cusco） · 马丘比丘（Machu Picchu）"], [null, "莫赖", null, "秘鲁库斯科（Cusco） · 莫赖（Moray）"], [null, "果子沟大桥", null, "中国新疆伊犁 · 果子沟大桥"], [null, "水车", null, "中国安徽黄山 · 西递"], [null, "油菜花", null, "中国安徽黄山 · 西递"], [null, "哈伍德庄园的国事卧室", null, "英国利兹 · 哈伍德庄园（Harewood House）"], [null, "哈伍德庄园的黄色客厅", null, "英国利兹 · 哈伍德庄园（Harewood House）"], [null, "法喜寺", null, "中国浙江杭州 · 法喜寺"], [null, "独龙族民居", null, "中国云南 · 从芒康到贡山"], [null, "雨中的村庄", null, "中国江西上饶 · 篁岭"], [null, "雨中的村庄", null, "中国安徽黄山 · 宏村"], [null, "鸟巢", null, "中国北京 · 国家体育馆"], [null, "高架与房屋", null, "中国上海"], [null, "输电塔", null, "中国上海"], [null, "夕阳下的塔吊", null, "美国纽约州布鲁克林"], [null, "东河与威廉斯堡", null, "美国纽约州布鲁克林"], [null, "布鲁克林", null, "美国纽约州布鲁克林"], [null, "惠特比市中心", null, "英国惠特比（Whitby）"]], "culture": [[null, "手作", null, "美国纽约州布鲁克林"], [null, "彩色毛线", null, "秘鲁库斯科（Cusco） · 钦切罗（Chinchero）"], [null, "风中的经幡", null, "中国西藏 · 从林芝到墨脱"], [null, "人、巴士与嘟嘟车", null, "斯里兰卡加勒（Galle） · 加勒古堡（Galle Fort）"], [null, "船", null, "新西兰奥克兰"], [null, "油画颜料", null, "美国纽约州纽约市 · 中央公园（Central Park）"], [null, "华盛顿广场公园喷泉", null, "美国纽约州纽约市 · 华盛顿广场公园（Washington Square Park）"], [null, "甲骨", null, "中国河南安阳 · 殷墟博物馆"], [null, "女史箴图", null, "英国伦敦 · 大英博物馆（British Museum）"], [null, "费城街头的蒸汽", null, "美国宾夕法尼亚州费城"], [null, "失焦的布鲁克林", null, "美国纽约州布鲁克林"], [null, "马蹄金与麟趾金", null, "中国江西南昌 · 海昏侯国遗址公园"], [null, "至尊魔戒", null, "新西兰奥克兰 · 维塔工作室（Wētā Workshop）"], [null, "雨帘", null, "中国江西南昌 · 滕王阁"]]};
+if (ZH) mergeInto(PHOTO_LIST, ZH_PHOTOS);
 const GALLERY = {};
 GALLERY_CATS.forEach(c => {
   GALLERY[c.key] = (PHOTO_LIST[c.key] || []).map(([file, title, caption, location, date]) => ({
@@ -2514,9 +2963,9 @@ if ("ResizeObserver" in window) {
      { type: "source", rows: [[label, value], …] }
    ============================================================ */
 const BLOG_CATS = [
-  { key: "archived", name: "Archived Projects" },
-  { key: "travel",   name: "Travel Logs" },
-  { key: "updates",  name: "Adventure" }
+  { key: "archived", name: T("Archived Projects", "往期项目") },
+  { key: "travel",   name: T("Travel Logs", "旅行日志") },
+  { key: "updates",  name: T("Adventure", "探险") }
 ];
 const BLOG_POSTS = [
   /* ---- Adventure ---- */
@@ -2609,13 +3058,13 @@ const BLOG_POSTS = [
     excerpt: "A graduation road trip in Hawaiʻi, Big Island and Honolulu.",
     blocks: [
       { type: "timeline", range: "05/25/2026 – 06/02/2026", items: [
-        { date: "05/26/2026", location: "Hawaiʻi Island · Akaka Falls, Hawaiʻi Tropical Botanical Garden" },
+        { date: "05/26/2026", location: "Hawaiʻi Island · ʻAkaka Falls, Hawaiʻi Tropical Botanical Garden" },
         { date: "05/27/2026", location: "Hawaiʻi Island · Maunakea" },
         { date: "05/28/2026", location: "Hawaiʻi Volcanoes National Park, Hawaiʻi Island · Hōlei Sea Arch" },
         { date: "05/29/2026", location: "Kona, Hawaiʻi Island · Greenwell Farms" },
         { date: "05/30/2026", location: "Oʻahu Island · Hoʻomaluhia Botanical Garden, Kualoa Ranch" },
         { date: "05/31/2026", location: "Honolulu, Oʻahu Island · Diamond Head Trail" },
-        { date: "06/01/2026", location: "Honolulu, Oʻahu Island · Manoa Falls" } ] } ] },
+        { date: "06/01/2026", location: "Honolulu, Oʻahu Island · Mānoa Falls" } ] } ] },
   { id: "tennessee-2026", category: "travel", title: "Tennessee, US", date: "10/2026",
     keywords: ["us", "americas"],
     excerpt: "A weekend road trip in Great Smoky Mountains National Park. Leaves hadn’t changed much yet.",
@@ -2719,7 +3168,7 @@ const BLOG_POSTS = [
     blocks: [
       { type: "timeline", range: "03/23/2025 – 03/31/2025", items: [
         { date: "03/24/2025", location: "On the plane" },
-        { date: "03/26/2025", location: "Auckland · City Centre, Silverdale, Weta Workshop" },
+        { date: "03/26/2025", location: "Auckland · City Centre, Silverdale, Wētā Workshop" },
         { date: "03/27/2025", location: "Waikato · Hobbiton" },
         { date: "03/28/2025", location: "Coromandel · Cathedral Cove, Hot Water Beach" },
         { date: "03/30/2025", location: "Auckland · One Tree Hill" },
@@ -2926,7 +3375,7 @@ const BLOG_POSTS = [
         { date: "05/30/2022", location: "Yucatán, Mexico · Valladolid, Chichén Itzá" },
         { date: "05/31/2022", location: "Cancún, Quintana Roo, Mexico · Playa Delfines, Maya Museum of Cancún" },
         { date: "06/01/2022", location: "Mexico City, Mexico · Metropolitan Cathedral, National Palace, Palacio de Bellas Artes, Angel of Independence, National Museum of Anthropology" },
-        { date: "06/03/2022", location: "State of Mexico, Mexico · Teotihuacan" },
+        { date: "06/03/2022", location: "State of Mexico, Mexico · Teotihuacán" },
         { date: "06/05/2022", location: "Miami, Florida, US · Miami Beach" } ] } ] },
   { id: "los-angeles-2022", category: "travel", title: "Los Angeles, California, US", date: "01/2022", range: "01/14/2022 – 01/16/2022",
     keywords: ["us", "americas"],
@@ -3042,9 +3491,9 @@ const BLOG_POSTS = [
     excerpt: "A school trip to Japan.",
     blocks: [
       { type: "timeline", range: "07/31/2016 – 08/04/2016", items: [
-        { date: "07/31/2016", location: "Tokyo · Suginami Animation Museum" },
-        { date: "08/02/2016", location: "Osaka" },
-        { date: "08/03/2016", location: "Kyoto · Kiyomizu-dera" },
+        { date: "07/31/2016", location: "Tōkyō · Suginami Animation Museum" },
+        { date: "08/02/2016", location: "Ōsaka" },
+        { date: "08/03/2016", location: "Kyōto · Kiyomizu-dera" },
         { date: "08/04/2016", location: "Nara · Tōdai-ji" } ] } ] },
   { id: "egypt-2016", category: "travel", title: "Egypt", date: "02/2016", range: "02/14/2016 – 02/17/2016",
     keywords: ["egypt", "africa"],
@@ -3403,8 +3852,8 @@ const BLOG_POSTS = [
     cover: { image: "media/blogs/interactive_silk_road/exhibition.jpg" }, coverRatio: "auto",
     excerpt: "Our NYU senior project: a multisensory installation recreating artifacts from four Silk Road regions with engraved acrylics, holograms, projection mapping, embroidery and physical samples.",
     blocks: [
-      { type: "source", rows: [["Role", "Co-creator with Sofia; led the digital recreations of the artifacts"], ["Context", "NYU B.S. Senior Project (collaborative)"], ["Tools", "Nikon D850, RealityCapture, Autodesk Maya, Blender, MapMap, Adobe Premiere Pro, Adobe Illustrator, Canva, PFAFF, Inkscape, Premier+2, Epilog Laser, physical materials"]] },
-      { type: "p", text: "Interactive Silk Road is a multisensory installation where the physical and digital worlds meet. It spans four regions of the Silk Road, each presenting representative cultural artifacts, many recreated with engraved acrylics and holograms, alongside physical samples and embroidered fabrics. I made it with my collaborator Sofia as our senior project. I mainly created the virtual representations of the artifacts: the photogrammetry model of Buddha Dipankara, projection mapping onto engraved acrylics, and holograms of interlocked acrylics. We worked together on the embroidery, exhibition materials and installation." },
+      { type: "source", rows: [["Role", "Co-creator with a collaborator; led the digital recreations of the artifacts"], ["Context", "NYU B.S. Senior Project (collaborative)"], ["Tools", "Nikon D850, RealityCapture, Autodesk Maya, Blender, MapMap, Adobe Premiere Pro, Adobe Illustrator, Canva, PFAFF, Inkscape, Premier+2, Epilog Laser, physical materials"]] },
+      { type: "p", text: "Interactive Silk Road is a multisensory installation where the physical and digital worlds meet. It spans four regions of the Silk Road, each presenting representative cultural artifacts, many recreated with engraved acrylics and holograms, alongside physical samples and embroidered fabrics. I made it with my collaborator as our senior project. I mainly created the virtual representations of the artifacts: the photogrammetry model of Buddha Dipankara, projection mapping onto engraved acrylics, and holograms of interlocked acrylics. We worked together on the embroidery, exhibition materials and installation." },
       { type: "p", text: "See the <a class=\"text-link\" href=\"https://docs.google.com/presentation/d/15ANa1y2N2-Cqh0eUPuJKcFP88EnwlkNLeXY9J4hJGg8/edit?usp=sharing\" target=\"_blank\" rel=\"noopener\">project plan</a> and the <a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Interactive-Silk-Road-19146d3d63298082a0bbe63b0420300d\" target=\"_blank\" rel=\"noopener\">process website</a> for full details." },
       { type: "h", text: "Research" },
       { type: "p", text: "The project is driven by preservation and accessibility. Drawing on digital and virtual museum concepts, it combines digital and physical experiences to deepen engagement with cultural heritage, raise awareness of history, and challenge stereotypes and prejudice tied to cultures, countries and identities, making the experience more tangible and meaningful for a wider audience. We researched artifacts across the Silk Road and how each could be represented." },
@@ -3415,10 +3864,10 @@ const BLOG_POSTS = [
       { type: "p", text: "Artifacts being featured:" },
       { type: "list", items: ["Buddha Statue: Buddha Dipankara (engraved acrylic and photogrammetry)", "Camel Bell (interlocked acrylic and hologram)", "Cave Art Mural: Pipa Player (engraved acrylic and projection mapping)", "Grapes (physical samples)", "Islamic Calligraphy (engraved acrylic and projection mapping)", "Jade: Nephrite Jade (physical samples in acrylic containers)", "Metalware: Gothic Chalice (interlocked acrylic and hologram)", "Porcelain: Vase (interlocked acrylic and hologram)", "Silk: Lotus Pattern (embroidery)", "Spices: Dried Limes, Sumac Berries, Golpar, Cumin (physical samples in acrylic containers)", "Tea: Green, Black, Oolong, White (physical samples in acrylic containers)", "Wool (knitting)"] },
       { type: "h", text: "Engraved Acrylics and Photogrammetry" },
-      { type: "p", text: "The <a class=\"text-link\" href=\"https://www.metmuseum.org/art/collection/search/42719\" target=\"_blank\" rel=\"noopener\">Buddha Dipankara</a> (Dingguang), from the Northern Wei dynasty (386–534), is on view at The Met Fifth Avenue, Gallery 206. Sofia engraved its outline on acrylic, and I captured the statue on site with photogrammetry, processed the model in RealityCapture and gave it a dissolve effect in Blender. See the <a class=\"text-link\" href=\"#project-03\">Buddha Dipankara project page</a> and the <a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Buddha-Dipankara-1a346d3d6329808fa0a6e71eb695d99b\" target=\"_blank\" rel=\"noopener\">process notes</a> for more." },
+      { type: "p", text: "The <a class=\"text-link\" href=\"https://www.metmuseum.org/art/collection/search/42719\" target=\"_blank\" rel=\"noopener\">Buddha Dipankara</a> (Dingguang), from the Northern Wei dynasty (386–534), is on view at The Met Fifth Avenue, Gallery 206. My collaborator engraved its outline on acrylic, and I captured the statue on site with photogrammetry, processed the model in RealityCapture and gave it a dissolve effect in Blender. See the <a class=\"text-link\" href=\"#project-03\">Buddha Dipankara project page</a> and the <a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Buddha-Dipankara-1a346d3d6329808fa0a6e71eb695d99b\" target=\"_blank\" rel=\"noopener\">process notes</a> for more." },
       { type: "gallery", items: [
         { image: "media/blogs/interactive_silk_road/Buddha_reference.png", caption: "Reference." },
-        { image: "media/blogs/interactive_silk_road/buddha_physical.jpeg", caption: "Laser-cut acrylic (Sofia)." } ], narrow: true },
+        { image: "media/blogs/interactive_silk_road/buddha_physical.jpeg", caption: "Laser-cut acrylic (collaborator)." } ], narrow: true },
       { type: "gallery", items: [
         { image: "media/blogs/interactive_silk_road/Buddha_process_1.jpg" },
         { image: "media/blogs/interactive_silk_road/buddha_process_2.png" },
@@ -3430,18 +3879,18 @@ const BLOG_POSTS = [
         { image: "media/blogs/interactive_silk_road/buddha_final_3.gif" },
         { video: "media/blogs/interactive_silk_road/buddha_final_4.mp4" } ], cols: 2, caption: "Rendered details, point cloud with dissolve effect in Blender, and the final video (Evaine)." },
       { type: "h", text: "Engraved Acrylics and Projection Mapping" },
-      { type: "p", text: "The <a class=\"text-link\" href=\"https://en.m.wikipedia.org/wiki/File:Mogao_Caves_Pipa-Player.jpg\" target=\"_blank\" rel=\"noopener\">Pipa Player</a> mural from the Mogao Caves and a <a class=\"text-link\" href=\"https://www.metmuseum.org/essays/calligraphy-in-islamic-art\" target=\"_blank\" rel=\"noopener\">folio of Islamic calligraphy</a> from a Qur'an manuscript (ca. 1180) at The Met were traced in Illustrator and laser-cut into acrylic by Sofia. I then projection-mapped them from behind in MapMap. See the <a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Cave-Art-Islamic-Calligraphy-1ad46d3d63298052a2d0fbe54b5046c7\" target=\"_blank\" rel=\"noopener\">process notes</a>." },
+      { type: "p", text: "The <a class=\"text-link\" href=\"https://en.m.wikipedia.org/wiki/File:Mogao_Caves_Pipa-Player.jpg\" target=\"_blank\" rel=\"noopener\">Pipa Player</a> mural from the Mogao Caves and a <a class=\"text-link\" href=\"https://www.metmuseum.org/essays/calligraphy-in-islamic-art\" target=\"_blank\" rel=\"noopener\">folio of Islamic calligraphy</a> from a Qur'an manuscript (ca. 1180) at The Met were traced in Illustrator and laser-cut into acrylic by my collaborator. I then projection-mapped them from behind in MapMap. See the <a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Cave-Art-Islamic-Calligraphy-1ad46d3d63298052a2d0fbe54b5046c7\" target=\"_blank\" rel=\"noopener\">process notes</a>." },
       { type: "gallery", items: [
         { image: "media/blogs/interactive_silk_road/Mural_reference.jpg", caption: "Reference of Pipa Player." },
-        { image: "media/blogs/interactive_silk_road/mural_physical.jpg", caption: "Laser-cut acrylic (Sofia)." } ], narrow: true },
+        { image: "media/blogs/interactive_silk_road/mural_physical.jpg", caption: "Laser-cut acrylic (collaborator)." } ], narrow: true },
       { type: "gallery", items: [
         { image: "media/blogs/interactive_silk_road/Projection_1.jpg" },
         { image: "media/blogs/interactive_silk_road/Projection_2.jpg" } ], caption: "Projection mapping in MapMap (Evaine)." },
       { type: "h", text: "Interlocked Acrylics and Holograms" },
-      { type: "p", text: "Three objects were recreated as interlocking acrylic outlines paired with holograms: a Jun kiln moon-white glaze yuhuchun <a class=\"text-link\" href=\"https://sketchfab.com/3d-models/aae4782772e947dca3bf182bb6ab3735\" target=\"_blank\" rel=\"noopener\">vase</a>, a <a class=\"text-link\" href=\"https://muzea.malopolska.pl/en/objects-list/2979\" target=\"_blank\" rel=\"noopener\">Gothic chalice</a> (ca. 1500) from the Museum of Ziemia Miechowska, and a <a class=\"text-link\" href=\"https://sites.duke.edu/dumic/instruments/percussion/middle-east/camel-bell/\" target=\"_blank\" rel=\"noopener\">camel bell</a> from Afghanistan in Duke University's collections. Sofia designed and laser-cut the acrylics, and I reassembled or modeled each object in Maya, optimized the lighting, rendered turntables, and prototyped the hologram boxes. See the <a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Porcelain-Vase-Gothic-Chalice-Camel-Bell-1aa46d3d632980988cf5c0d15b8f5ee0\" target=\"_blank\" rel=\"noopener\">process notes</a>." },
+      { type: "p", text: "Three objects were recreated as interlocking acrylic outlines paired with holograms: a Jun kiln moon-white glaze yuhuchun <a class=\"text-link\" href=\"https://sketchfab.com/3d-models/aae4782772e947dca3bf182bb6ab3735\" target=\"_blank\" rel=\"noopener\">vase</a>, a <a class=\"text-link\" href=\"https://muzea.malopolska.pl/en/objects-list/2979\" target=\"_blank\" rel=\"noopener\">Gothic chalice</a> (ca. 1500) from the Museum of Ziemia Miechowska, and a <a class=\"text-link\" href=\"https://sites.duke.edu/dumic/instruments/percussion/middle-east/camel-bell/\" target=\"_blank\" rel=\"noopener\">camel bell</a> from Afghanistan in Duke University's collections. My collaborator designed and laser-cut the acrylics, and I reassembled or modeled each object in Maya, optimized the lighting, rendered turntables, and prototyped the hologram boxes. See the <a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Porcelain-Vase-Gothic-Chalice-Camel-Bell-1aa46d3d632980988cf5c0d15b8f5ee0\" target=\"_blank\" rel=\"noopener\">process notes</a>." },
       { type: "gallery", items: [
         { image: "media/blogs/interactive_silk_road/Vase_reference.png", caption: "Reference." },
-        { image: "media/blogs/interactive_silk_road/vase_physical.jpg", caption: "Laser-cut acrylic (Sofia)." } ], narrow: true },
+        { image: "media/blogs/interactive_silk_road/vase_physical.jpg", caption: "Laser-cut acrylic (collaborator)." } ], narrow: true },
       { type: "gallery", items: [
         { image: "media/blogs/interactive_silk_road/hologram_1.png" },
         { image: "media/blogs/interactive_silk_road/Hologram_2.jpg" } ], caption: "Holograms (Evaine)." },
@@ -3456,10 +3905,10 @@ const BLOG_POSTS = [
         { image: "media/blogs/interactive_silk_road/embroidery_process_3.png" },
         { image: "media/blogs/interactive_silk_road/embroidery_process_4.jpg" } ], cols: 2, caption: "Embroidery process." },
       { type: "h", text: "Physical Samples and Acrylic Containers" },
-      { type: "p", text: "Visitors can taste grapes, touch nephrite jade, and smell spices (dried limes, sumac berries, golpar, cumin) and teas (green, black, oolong, white), held in laser-cut acrylic containers made by Sofia." },
+      { type: "p", text: "Visitors can taste grapes, touch nephrite jade, and smell spices (dried limes, sumac berries, golpar, cumin) and teas (green, black, oolong, white), held in laser-cut acrylic containers made by my collaborator." },
       { type: "gallery", items: [
         { image: "media/blogs/interactive_silk_road/Physical_1.jpg" },
-        { image: "media/blogs/interactive_silk_road/Physical_2.jpg" } ], narrow: true, caption: "Laser-cut acrylic container (Sofia)." },
+        { image: "media/blogs/interactive_silk_road/Physical_2.jpg" } ], narrow: true, caption: "Laser-cut acrylic container (collaborator)." },
       { type: "h", text: "Exhibition Materials" },
       { type: "p", text: "We designed labels for each artifact, spice and tea, with interaction hints printed on the back, and a folded brochure: the front describes every artifact, and the back shows where each one sits across the four frames. There is also an <a class=\"text-link\" href=\"https://youtu.be/BR9fPGQsWxg\" target=\"_blank\" rel=\"noopener\">audio guide</a>." },
       { type: "gallery", items: [
@@ -3476,7 +3925,7 @@ const BLOG_POSTS = [
         { image: "media/blogs/interactive_silk_road/pre_exhibition.jpg", caption: "Before the showcase." } ] },
       { type: "img", image: "media/blogs/interactive_silk_road/exhibition.jpg", caption: "Showcase day." },
       { type: "h", text: "Reflection" },
-      { type: "p", text: "Sofia and I worked closely all semester, ideating and staying late at 370 Jay Street and the Makerspace, motivated by knowing this was our last undergraduate project. We picked up new skills like embroidery from scratch, used a calendar to manage every component, secured funding, hauled materials from labs and found alternatives when first ideas failed. Hanging heavy pieces with fishing wire was harder than expected, and in hindsight we would have planned the lighting and flow more carefully so visitors could see each artifact better. The project taught us exhibition design, project management and hands-on installation, and left us satisfied and motivated." },
+      { type: "p", text: "My collaborator and I worked closely all semester, ideating and staying late at 370 Jay Street and the Makerspace, motivated by knowing this was our last undergraduate project. We picked up new skills like embroidery from scratch, used a calendar to manage every component, secured funding, hauled materials from labs and found alternatives when first ideas failed. Hanging heavy pieces with fishing wire was harder than expected, and in hindsight we would have planned the lighting and flow more carefully so visitors could see each artifact better. The project taught us exhibition design, project management and hands-on installation, and left us satisfied and motivated." },
       { type: "p", text: "Thanks to our supervisor Carla, our classmates and friends, NYU Tandon Undergraduate Academics, and the IDM program." } ] },
   { id: "walligraphy", category: "archived", title: "Walligraphy", date: "12/31/2025",
     keywords: ["calligraphy"],
@@ -3752,6 +4201,10 @@ const BLOG_POSTS = [
 
 ];
 
+/* Chinese (中文) text for blog posts, keyed by post id; blocks are matched by position. */
+const ZH_POSTS = {"rubin-museum": {"title": "鲁宾喜马拉雅艺术博物馆", "excerpt": "在鲁宾喜马拉雅艺术博物馆（Rubin Museum of Himalayan Art）从事数字阐释实习。", "blocks": {"0": {"text": "自 2026 年 9 月起，我在鲁宾喜马拉雅艺术博物馆（Rubin Museum of Himalayan Art）的编辑与数字内容团队实习，专注于数字阐释：在数字空间中重新构想实体展览。我的项目包括 Digital Masterworks 网站的前端概念与内容结构、根据调研与工作坊笔记整理的曼荼罗实验室（Mandala Lab）数字应用需求建议书（RFP），以及 Google Arts &amp; Culture 上的高清图像。"}, "1": {"text": "在此之前，2026 年 6 月至 7 月，我参加了鲁宾博物馆的体验设计工作坊（Experiential Design Workshop），我们的团队将曼荼罗实验室重新构想为一种数字体验。详见<a class=\"text-link\" href=\"#blogs/resonance-ensemble\">共鸣乐团（Resonance Ensemble）</a>。"}}}, "montclair-history-center": {"title": "蒙特克莱尔历史中心", "excerpt": "在蒙特克莱尔历史中心（Montclair History Center）的暑期实习。", "blocks": {"0": {"text": "2026 年 5 月至 8 月，我在蒙特克莱尔历史中心（Montclair History Center）实习，参与 3D 数字化、研究、社交媒体和馆藏工作，并由此完成了两个项目：<a class=\"text-link\" href=\"#project-01\">3D 扫描壁炉</a>和<a class=\"text-link\" href=\"#project-02\">蒙特克莱尔历史地图</a>。"}, "1": {"caption": "在蒙特克莱尔历史中心实习。"}}}, "courses": {"title": "课程", "excerpt": "2021–2026 年修读的全部课程。", "blocks": {"0": {"text": "设计与媒体：项目制"}, "2": {"text": "设计与媒体：讲授制"}, "4": {"text": "人类学、心理学与国际教育"}, "6": {"text": "工程与科学"}, "8": {"text": "语言与音乐"}, "10": {"text": "职业项目"}, "1": {"items": ["三维建模（3D Modeling）", "我们之后：后人类媒体（After Us: Post-human Media）", "音频基础（Audio Foundations）", "传播实验室（Communications Lab）", "创意编程（Creative Coding）", "数字遗产（Digital Heritage）", "纪录片电影（Documentary Cinema）", "构思与原型设计（Ideation and Prototyping）", "互动叙事（Interactive Narrative）", "电影特效导论（Introduction to Special Effects in Filmmaking）", "网页开发导论（Introduction to Web Development）", "媒体法律（Media Law）", "博物馆参观与无障碍阐释（Museum Access and Accessible Interpretation）", "数字媒体预毕业论文（研究方法）（Pre-Thesis in Digital Media: Research Methods）", "创意行业专业实践（Professional Practices for Creatives）", "扫描万物（Scan Everything）", "数字媒体毕业设计（Senior Project in Digital Media）", "静态与动态影像（Still and Moving Images）", "地面摄影测量数据采集（Terrestrial Photogrammetry Data Capture）", "数字媒体毕业论文（Thesis in Digital Media）", "用户体验设计（User Experience Design）", "虚拟制片开发（Virtual Production Development）", "视觉基础（Visual Foundations）"]}, "3": {"items": ["建筑作为媒介（Architecture as Media）", "娱乐与媒体产业（Entertainment and Media Industries）", "媒体研究导论（Introduction to Media Studies）", "技术对娱乐与媒体的影响（Technology’s Impact on Entertainment and Media）", "媒体与技术的理论及文化影响（Theories and Cultural Impact of Media and Technology）"]}, "5": {"items": ["认知发展（Cognitive Development）", "文物保护与藏品管理（Conservation and Collections Management）", "中国社会变迁民族志（Ethnographies of Change in China）", "人类社会与文化（Human Society and Culture）", "走进全球网络：纽约大学的海外学习与交流（Inside the Global Network: Study Abroad and Exchange at NYU）", "考古学导论（Introduction to Archaeology）", "考古学中的数据科学导论（Introduction to Data Science in Archaeology）", "心理学导论（Introduction to Psychology）", "纽约城市饮食文化景观（New York City Food Landscape）", "社会文化人类学（Social Cultural Anthropology）"]}, "7": {"items": ["工程师微积分（Calculus for Engineers）", "电与光（Electricity and Light）", "工程与技术论坛（Engineering and Technology Forum）", "普通生物学（General Biology）", "编程与问题求解导论（Introduction to Programming and Problem Solving）", "运动与声音（Motion and Sound）", "航空科学概论（Survey of Aviation Science）"]}, "9": {"items": ["美国流行音乐（American Popular Music）", "古琴小组课（Group Guqin）", "国际写作工作坊（International Writing Workshop）"]}, "11": {"items": ["数据分析（Data Analytics）", "数字营销（Digital Marketing）"]}}}, "ms-thesis": {"title": "硕士论文", "excerpt": "我的硕士论文：一件以手工焦边纸为材料的装置。", "blocks": {"0": {"text": "我的硕士论文 <a class=\"text-link\" href=\"#blogs/paper-fire-parametric-chaos\"><em>纸，火，参数化混沌（Paper, Fire, Parametric Chaos）</em></a> 是一件以手工制作、线香焦边的纸为材料的装置，灵感来自锦灰堆。作品在纽约大学数字媒体硕士毕业展上展出。"}, "1": {"caption": "毕业展海报。"}}}, "bs-senior-project": {"title": "本科毕业项目", "excerpt": "我的本科毕业项目：一件多感官装置。", "blocks": {"0": {"text": "本科毕业项目中，我和合作者完成了<a class=\"text-link\" href=\"#blogs/interactive-silk-road\">互动丝绸之路（Interactive Silk Road）</a>，一件重现丝绸之路四个地区文物的多感官装置。"}, "1": {"caption": "展览结束时。"}}}, "peru-alternative-break": {"title": "秘鲁", "excerpt": "在秘鲁的公益假期之旅，住在寄宿家庭。", "blocks": {"0": {"text": "2025 年 1 月，我在秘鲁度过了一次公益假期（alternative break），参与社区发展工作，并住在库斯科（Cusco）的一户寄宿家庭。详见<a class=\"text-link\" href=\"#blogs/peru-2025\">旅行日志</a>。"}, "1": {"caption": "为当地一所托儿所准备教学材料并布置教室。"}}}, "sri-lanka-alternative-break": {"title": "斯里兰卡", "excerpt": "我的第一次公益假期，在斯里兰卡。", "blocks": {"0": {"text": "2024 年 8 月，我参加了第一次公益假期（alternative break），在斯里兰卡加勒（Galle）参与环境保护与社区发展工作。详见<a class=\"text-link\" href=\"#blogs/sri-lanka-2024\">旅行日志</a>。"}, "1": {"caption": "清理海滩。"}}}, "leeds-summer-school": {"title": "利兹国际暑期学校", "excerpt": "在利兹大学（University of Leeds）的暑期课程。", "blocks": {"0": {"text": "2024 年夏天，我在利兹大学（University of Leeds）的利兹国际暑期学校（Leeds International Summer School）学习，并完成了<a class=\"text-link\" href=\"#blogs/fishing-day\">钓鱼日（Fishing Day）</a>。详见<a class=\"text-link\" href=\"#blogs/uk-2024\">旅行日志</a>。"}, "1": {"caption": "用绿幕拍摄一段哈利·波特场景。"}}}, "nyu-shanghai": {"title": "上海纽约大学", "excerpt": "在上海纽约大学的两个学期。", "blocks": {"0": {"text": "2023 年，我在上海纽约大学度过了一年。学习之余，我担任了 Site Ambassador 和交换项目助理（Study Away Program Assistant），并在田字格公益实习，搭建了它的<a class=\"text-link\" href=\"#blogs/tianzige\">官方网站</a>。"}, "1": {"caption": "作为 Site Ambassador 布置学期末的交换学习成果展。"}}}, "paper-fire-parametric-chaos": {"excerpt": "一件以手工焦边纸为材料的硕士毕业装置，探讨火与受控的随机性如何把破坏转化为一种创作。", "blocks": {"0": {"rows": [["角色", "艺术家与设计师（个人项目）"], ["背景", "纽约大学硕士毕业项目（个人）"], ["工具", "造纸工具、装订工具、实物材料、JavaScript"]]}, "1": {"text": "<em>纸，火，参数化混沌（Paper, Fire, Parametric Chaos）</em>探讨脆弱的材料、破坏性的力量与规则系统之间的张力。通过反复的焦边实验，项目研究受控的随机性如何产生不可预测的结果，把破坏视为一种创作，而非损失。"}, "2": {"text": "纸不仅是档案与记录的媒介，也承载着脆弱、记忆与缓慢。火则是一种难以控制的力量，意味着不可逆与扰动。为纸张焦边体现了一种抗拒秩序、接纳随机的转变，把混沌重新理解为生命力的来源，而不是错误。作品于 2026 年 5 月 7 日在纽约大学数字媒体硕士毕业展上展出，位于一个安静的小房间里，参观者可以触摸作品。展览由五个部分组成：<em>Since 2002</em>，悬挂叠层的手工纸；<em>Becoming Circles</em>，并排陈列的焦边样本；<em>Past and Wishes</em>，锦灰堆风格的拼贴；<em>To Be Tossed</em>，一面环境投影屏；以及一个让参观者亲手制作书签的周边台。"}, "3": {"text": "锦灰堆（锦：织锦；灰：灰烬；堆：堆叠），又称八破，是一种中国传统艺术形式，把废弃、残破或烧毁的文化物件碎片，如书法、绘画、信札和拓片，以混乱的美感层叠拼贴在一起。烫边则是用燃着的线香在纸上烫出孔洞和焦黑的边缘。"}, "4": {"text": "主题：随机性、物质性、空间性、时间性、感知。"}, "5": {"text": "Since 2002 | 悬挂与叠层"}, "6": {"text": "根据我的旅行时间线制作的悬挂叠层手工纸：面积代表次数，厚度代表时长，偏移代表距离，形状代表地图。纸张经手工制作、焦边后叠放并用线装订，参观者可以触摸。28 × 22 × 10 厘米。详见<a class=\"text-link\" href=\"https://drive.google.com/file/d/1wyaKbaDrURl_aIzOhUTURCXJkX3QxPJ9/view\" target=\"_blank\" rel=\"noopener\">数字说明</a>。"}, "7": {"caption": "手工造纸。"}, "8": {"caption": "叠放并焦边。"}, "9": {"caption": "悬挂作品。"}, "10": {"text": "Becoming Circles | 并排陈列"}, "11": {"text": "对 40 种不同的纸进行程度相近的焦边，每张约 6 × 6 厘米，并排钉在手工纸（Unryu Kozo Chiri White）上供参观者触摸。94 × 63.5 厘米。"}, "12": {"caption": "不同纸张的焦边样本。"}, "13": {"caption": "排列、钉合与装裱。"}, "14": {"text": "Past and Wishes | 拼贴"}, "15": {"text": "一幅繁复的拼贴：用不同颜色的闪光墨水书写的书法、个人与当代的物件、印章和硬币的拓印，边缘以锦灰堆的方式焦烫，装裱在 Lokta 纸上。76 × 51 厘米。详见<a class=\"text-link\" href=\"https://drive.google.com/file/d/1YdMZV9IkVSd3ziwx5uxbkvPP3iHt9pWf/view\" target=\"_blank\" rel=\"noopener\">数字说明</a>。"}, "16": {"caption": "书写与收集素材。"}, "17": {"caption": "焦烫边缘并拼贴。"}, "18": {"text": "To Be Tossed | 环境投影屏"}, "19": {"text": "投影在墙上的虚拟环境背景，用 p5.js 编写，随机生成的焦边会随时间循环。122 × 71 厘米。详见 <a class=\"text-link\" href=\"https://editor.p5js.org/js12353/sketches/N53p1gxCo\" target=\"_blank\" rel=\"noopener\">p5.js 作品</a>。"}, "20": {"caption": "用 p5.js 编写的随机焦边。"}, "21": {"text": "书签制作 | 周边台"}, "22": {"text": "一张让参观者用预先焦边的材料亲手制作锦灰堆书签的桌子，并配有介绍这一传统的说明卡和步骤卡。"}, "23": {"caption": "准备材料。"}, "24": {"caption": "书签样品。"}, "25": {"text": "展览物料"}, "26": {"items": ["<strong>另类论文：</strong>论文的印刷版，手工装订。", "<strong>导览手册：</strong>印刷并手工装订。", "<strong>标识：</strong>“请触摸”“轻触手机”和联系方式。", "<strong>数字说明：</strong>为 <em>Since 2002</em> 和 <em>Past and Wishes</em> 准备，用手机轻触 NFC 标签即可打开。", "<strong>周边台：</strong>介绍卡、步骤卡和打印的锦灰堆素材。"]}, "27": {"caption": "手工装订另类论文和导览手册。"}, "28": {"text": "展览"}, "29": {"text": "所有部分一起布置在 372 号房间，约 297 × 297 × 236 厘米：立体作品悬挂在天花板下或放在桌上，平面作品挂在墙上或投影。"}, "30": {"caption": "房间模型与实际房间。"}, "31": {"caption": "装置全貌。"}, "32": {"caption": "细节。"}, "33": {"text": "论文"}, "34": {"text": "<em>Paper, Fire, Parametric Chaos: Designing Unpredictability Through Material Systems and Cultural Memory</em> 以基于实践的方法，探讨纸、火与规则系统之间的相互作用。项目提出“参数化混沌”的概念：预设的参数塑造结果，但由于材料特性和环境条件，结果本质上仍不可预测。通过手工纸与线香焦边的反复实验，并借鉴锦灰堆的碎片美学，作品探讨了破坏与创造如何共存。最终的装置强调触觉参与与缓慢，邀请观众与脆弱的材料互动，并反思不确定性。通过把随机性重新理解为一种生成力量，项目提出：受控的不可预测性能够拓展我们对秩序与混沌关系的理解。"}, "35": {"text": "在 ProQuest 上<a class=\"text-link\" href=\"https://www.proquest.com/dissertations-theses/paper-fire-parametric-chaos-designing/docview/3351046596/se-2?accountid=12768\" target=\"_blank\" rel=\"noopener\">阅读论文全文</a>。"}, "36": {"text": "时间线"}, "37": {"caption": "按周和按部分划分的时间线。"}, "38": {"text": "材料与后勤"}, "39": {"text": "收集材料本身就是一个项目。纸张研究从纽约大学美术学院（Institute of Fine Arts）图书馆开始，各种手工纸和特种纸、闪光墨水以及造纸工具从 Blick 等处订购。装裱用的树枝是亲手捡来的，锦灰堆素材通过 IDM Print Lab 大幅面打印。投影仪、摄像头、桌子、落地灯和延长线从 Media Commons 和 IDM 设备室借用，我还另外申请了一个房间，让作品能在安静的环境中被观看。"}, "40": {"text": "实验"}, "41": {"text": "项目源于一系列材料实验，并记录在每周的日志中："}, "42": {"items": ["<strong>纸与墨：</strong>纸张的纤维和表面处理，加上水性或油性墨水，会影响书写是否顺滑、笔画能持续多久、墨水的晕染、光泽，以及每一笔的锐利度和粗细。", "<strong>纸与焦边：</strong>纤维粗细、纤维种类和纸张厚度，加上线香的角度，会影响焦边是否可控、气味和速度、能否只烧焦而不烧穿，以及痕迹的形状和颜色。", "<strong>线香角度：</strong>垂直于纸边时，线香会立即烫焦并留下细边，但香头容易折断；倾斜着用末端烫时，边缘先变褐色，再变成一条细细的黑线，但仍可能直接烧穿。", "<strong>不同的纸：</strong>黑纸焦烫时有鞭炮的气味，并形成峡湾般的边缘；打印纸保留锋利的棱角；其他纸则不会。", "<strong>风：</strong>风带来了它自己的不确定性。某个孔洞或边缘也许会达到完美的构图，但火还在继续，那一刻转瞬即逝。", "<strong>造纸：</strong>纸浆碎片越小、浸泡越久，纸就越细腻。打印纸比牛皮纸更易吸水、分解和成形，用更少的材料就能做出更平整的纸；牛皮纸撕开时则会保留层次和纤维条。", "<strong>叠层纸：</strong>较厚的手工纸比单张纸更难焦烫，因为火不容易蔓延。沿着地图轮廓焦烫边缘，就像在快进观看水流塑造地貌。"]}, "43": {"text": "参考资料"}, "44": {"items": ["<strong>纸的物质性</strong>（脆弱、档案、记忆、手工、缓慢）：<a class=\"text-link\" href=\"https://search.library.nyu.edu/discovery/fulldisplay?docid=alma990029598570107876&context=L&vid=01NYU_INST:NYU&lang=en&search_scope=CI_NYU_CONSORTIA&adaptor=Local%20Search%20Engine&tab=Unified_Slot\" target=\"_blank\" rel=\"noopener\">Hand Papermaking Journal</a>、<a class=\"text-link\" href=\"https://search.library.nyu.edu/discovery/fulldisplay?docid=alma990025204380107876&context=L&vid=01NYU_INST:NYU&lang=en&search_scope=CI_NYU_CONSORTIA&adaptor=Local%20Search%20Engine&tab=Unified_Slot&query=any,contains,The%20Art%20and%20Craft%20of%20Paper\" target=\"_blank\" rel=\"noopener\">The Art and Craft of Handmade Paper</a>、<a class=\"text-link\" href=\"https://search.library.nyu.edu/discovery/fulldisplay?docid=alma990024252530107876&context=L&vid=01NYU_INST:NYU&lang=en&search_scope=CI_NYU_CONSORTIA&adaptor=Local%20Search%20Engine&tab=Unified_Slot&query=any,contains,Specialty%20Papers,%20Their%20Properties%20and%20Applications\" target=\"_blank\" rel=\"noopener\">Specialty Papers: Their Properties and Applications</a>", "<strong>火的仪式</strong>（破坏、转变、不可逆、风险）：<a class=\"text-link\" href=\"https://oxfordre.com/anthropology/display/10.1093/acrefore/9780190854584.001.0001/acrefore-9780190854584-e-52\" target=\"_blank\" rel=\"noopener\">Fire Use</a>", "<strong>熵：</strong><a class=\"text-link\" href=\"https://www.academia.edu/38722297/ART_and_ENTROPY_Impressions\" target=\"_blank\" rel=\"noopener\">Art &amp; Entropy: Impressions</a>", "<strong>锦灰堆的历史：</strong><a class=\"text-link\" href=\"https://search.library.nyu.edu/discovery/fulldisplay?docid=alma990064342610107876&context=L&vid=01NYU_INST:NYU&lang=en&search_scope=CI_NYU_CONSORTIA&adaptor=Local%20Search%20Engine&tab=Unified_Slot&query=any,contains,jinhuidui\" target=\"_blank\" rel=\"noopener\">The 8 Brokens: Chinese Bapo Painting</a>", "<strong>触觉参与：</strong>Managing a Working Collection，以及 Smell of Heritage: A Framework for the Identification, Analysis and Archival of Historic Odours", "<strong>其他艺术家：</strong><a class=\"text-link\" href=\"https://www.nancymcohen.com/pages/images_art.php\" target=\"_blank\" rel=\"noopener\">Nancy Cohen</a>（手工纸）、<a class=\"text-link\" href=\"https://www.paperjoy.studio/\" target=\"_blank\" rel=\"noopener\">Kelly M. O’Brien</a>（焦边纸）、<a class=\"text-link\" href=\"https://www.spazuk.com/\" target=\"_blank\" rel=\"noopener\">Steven Spazuk</a>（烟熏画）"]}}, "title": "纸，火，参数化混沌"}, "vocabtwister": {"excerpt": "一个用于个性化学习的全栈词汇应用，包含每日卡组、按熟悉度标签的间隔重复、打卡日历和测验。", "blocks": {"0": {"rows": [["角色", "设计与开发（个人项目）"], ["背景", "个人项目"], ["工具", "Supabase、HTML、JavaScript、Claude"]]}, "1": {"text": "搓词机（VocabTwister）是一个为个性化学习打造的全栈词汇应用。单词存储在 Supabase 数据库中，并根据每个词的熟悉程度，通过间隔重复安排复习。"}, "2": {"text": "每日练习"}, "3": {"text": "应用每天生成一组单词卡：3、4、5、10 个或自定义数量。学习者可以按主题筛选，设置新词与复习词的比例，应用还会估算学完整个词库还需要几天。翻转卡片可查看释义、相关词和例句。当天的卡组会被保存，刷新页面也不会重新洗牌。"}, "4": {"text": "每个单词都有一个熟悉度标签，决定它多久出现一次："}, "5": {"items": ["<strong>Stranger：</strong>新词，每 1–4 天复习一次。", "<strong>OneNoodle：</strong>正在学习的词，每 7–14 天。", "<strong>Acquaintance：</strong>基本掌握的词，每 3–4 周。", "<strong>Friend：</strong>已掌握的词。", "<strong>GeNe：</strong>标记总是忘记的词，出现频率加倍。"]}, "6": {"items": [{"caption": "首页。"}, {"caption": "每日练习卡组。"}]}, "7": {"text": "每周打卡"}, "8": {"text": "月历记录每天学习的单词数。一天学满 10 个词会得到绿色对勾，一周中有五天打卡后整周变绿。每天的数量都可以修改，也可以翻看过去的月份。日期按美国山地时间计算，与和导师约定的学习安排一致。"}, "9": {"caption": "每月打卡日历。"}, "10": {"text": "全部词汇"}, "11": {"text": "完整词库是一个可排序的表格，包含释义、相关词、主题、标签、添加日期和出现次数等列，可按标签或主题筛选。每行都有快捷按钮，可以重新打标签、编辑或删除单词。一个词可以属于多个主题，主题也可以重命名或删除。"}, "12": {"caption": "完整词库。"}, "13": {"text": "添加与编辑单词"}, "14": {"text": "每个单词都会录入中文释义、相关词和五个例句。例句是手写的而不是生成的，这样可以确保读起来自然。之后可以在同一个编辑窗口中修改释义、主题和例句。"}, "15": {"items": [{"caption": "添加单词。"}, {"caption": "编辑单词。"}]}, "16": {"text": "测验"}, "17": {"text": "测验把已掌握的词和其他见过多次的词混在一起，比例可用滑块调整，并保留成绩记录和正确率。答错的词会安排在两天后再次出现，并降低一个标签等级，以便多加练习。"}, "18": {"caption": "测验与成绩记录。"}}, "title": "搓词机"}, "redesign-albert": {"title": "Albert 重设计", "excerpt": "重新设计纽约大学的学生信息系统 Albert，让选课与注册更轻松。", "blocks": {"0": {"rows": [["角色", "UX 设计师（个人项目）"], ["背景", "纽约大学课程"], ["工具", "Figma"]]}, "1": {"text": "重新设计纽约大学的学生信息系统 Albert，重点是选课注册。详见<a class=\"text-link\" href=\"https://docs.google.com/presentation/d/1UOxUdZh19R2jPyzVNFdpf72BKUnITPSPzsZvySN0HZg/edit#slide=id.p\" target=\"_blank\" rel=\"noopener\">过程演示文稿</a>，也可以试用 <a class=\"text-link\" href=\"https://www.figma.com/proto/h9mW4eiVQJqBEN2C9JvBWB/Redesign-Albert?node-id=295-2813&scaling=contain&page-id=295%3A2&starting-point-node-id=295%3A2813&t=YpEKBvO5Qhzq3LPx-1\" target=\"_blank\" rel=\"noopener\">Figma 原型</a>。"}, "2": {"text": "简介"}, "3": {"text": "Albert 为纽约大学的学生、教师、导师、行政人员和校友处理注册、课表、成绩单和缴费。选课注册是最常用的功能，但学生觉得很难用：子页面无法适配不同屏幕，搜索和筛选不直观，也没有课表和课程评价工具。这次重设计调整了布局并重新组织了信息，重点放在注册上。"}, "4": {"caption": "原版 Albert。"}, "5": {"text": "共情与定义"}, "6": {"text": "我先头脑风暴列出痛点并按严重程度排序，然后采访学生使用 Albert 的频率、使用的设备，以及最好和最差的体验。常见的抱怨包括：搜索功能弱、浮动的购物车在 iPad 上会卡住、筛选条件需要分组、关闭购物车会跳回主页、横幅令人困惑、搜索结果里没有课程评价，以及日历难用到学生只好改用 Google 日历。"}, "7": {"text": "定位：面向需要搜索和注册课程的纽约大学学生，这次重设计是一个让找课更轻松的网站，筛选条件、课程信息和注册逻辑都更清晰。"}, "8": {"text": "用户画像"}, "9": {"text": "Steven 是一位做事有条理的计算机专业大三学生，需要页面加载快、注册高峰期不崩溃，以及更好的筛选。Alex 是一位富有创意的 IMA 大一学生，需要更好的子页面、更清晰的退出路径、iPad 支持和无障碍设计。Vlage 是一位善于社交的商科大四学生，需要更好的日历、课程评价，以及在搜索和注册中直接修改、调换课程的功能。"}, "11": {"text": "构思"}, "12": {"text": "主要流程从登录开始，经过课程搜索、搜索结果、添加和选择课程，到确认并成功注册。"}, "13": {"caption": "用户流程。"}, "14": {"items": [{"caption": "网站地图。"}, {"caption": "演示。"}]}, "15": {"text": "原型"}, "16": {"text": "我为三个页面制作了线框图、视觉稿和原型：课程表、课程搜索空白页和课程搜索结果页。"}, "17": {"caption": "线框图。"}, "18": {"caption": "视觉稿。"}, "19": {"text": "测试"}, "20": {"text": "测试者对原版 Albert 的搜索、筛选和日历评价不错，但浮动的结果子页面和退出路径不直观。期中版本的设计过于密集，搜索栏下有一些不必要的功能和筛选。最终版本加入了更多颜色、居中或左移的布局、更细的滚动条和边框，以及圆角。测试者尤其喜欢课表功能，它取代了手动制作表格。"}, "21": {"text": "前后对比"}, "22": {"text": "课程搜索首页：横幅被课程表取代，竖向菜单改为横向，固定在页面顶部。"}, "23": {"items": [{"caption": "原版 Albert。"}, {"caption": "期中原型。"}, {"caption": "最终设计。"}]}, "24": {"text": "课程搜索页：改为独立的子页面而不是浮动面板，搜索栏下的筛选也得到改进。"}, "25": {"items": [{"caption": "原版 Albert。"}, {"caption": "期中原型。"}, {"caption": "最终设计。"}]}, "26": {"text": "课程搜索结果页：重新组织课程信息，每门课纵向排列以便比较，提供可点击的日历、地图和评价图标，已添加的课程显示在结果旁边。"}, "27": {"items": [{"caption": "原版 Albert。"}, {"caption": "期中原型。"}, {"caption": "最终设计。"}]}, "28": {"text": "后续工作"}, "29": {"text": "平板和手机版本，以及技术改进，让系统在大量学生同时注册时不会崩溃。"}, "30": {"text": "参考资料"}}}, "noz": {"excerpt": "为虚构的鼻部防晒品牌 Nöz 做品牌、Shopify 店铺和完整的营销方案，从 SEO、邮件到付费社交广告。", "blocks": {"0": {"rows": [["角色", "数字营销（个人项目）"], ["背景", "Podium Education 数字营销项目"], ["工具", "Google Optimize、Google Ads、Meta Ads、Sprout Social、Insense"]]}, "1": {"text": "Nöz 是一个虚构的鼻部防晒品牌。我为它搭建了一个 <a class=\"text-link\" href=\"https://globaltech-evaine-sun.myshopify.com\" target=\"_blank\" rel=\"noopener\">Shopify 店铺</a>，并规划了从品牌、SEO 到邮件、社交媒体和付费推广的营销。"}, "2": {"text": "目标客户"}, "3": {"text": "目标客户是注重风格的消费者，以一位名叫 Frances 的用户画像为代表：他们希望产品能表达自己的个性，可持续性则是次要的吸引力。价值主张：珊瑚礁友好、纯素、零残忍的防晒，也是表达个人风格的方式。"}, "5": {"text": "品牌"}, "6": {"text": "配色使用明亮的颜色，尤其是绿色和黄色，传达活力与自然。"}, "7": {"caption": "配色。"}, "8": {"text": "网站"}, "9": {"text": "首页标题强调风格与可持续，背景图片颂扬独特性，绿色点缀代表自然，蓝色徽章传递信任。"}, "10": {"caption": "首页。"}, "11": {"caption": "商店、博客和购物车页面。"}, "12": {"text": "SEO"}, "13": {"text": "我研究了五个关键词（reef safe sunscreen、best spf for face、sunblock on nose、eco friendly sunscreen、cool sunscreen），并在元标题中使用了其中两个。"}, "15": {"text": "A/B 测试"}, "16": {"text": "我提议在 Google Optimize 中对行动按钮的颜色做 A/B 测试，因为目前的亮黄色可能显得突兀。"}, "18": {"text": "促销与邮件"}, "19": {"text": "首页公告栏和促销标题，以及确认邮件、促销邮件和购物车放弃提醒邮件。"}, "20": {"caption": "促销。"}, "21": {"items": [{"caption": "确认邮件。"}, {"caption": "促销邮件。"}, {"caption": "购物车放弃提醒邮件。"}]}, "22": {"text": "社交媒体"}, "23": {"text": "以用户生成内容为核心的 Instagram 帖子。"}, "25": {"text": "活动简报"}, "26": {"text": "<a class=\"text-link\" href=\"https://docs.google.com/document/d/1sddwzEg1g14nDeRLpJbBRdLcnhE0BI6bKp9yA27By7U/edit?tab=t.0\" target=\"_blank\" rel=\"noopener\">活动简报</a> “Nöz Goes Global” 将品牌拓展到伦敦，旨在提升销量，并了解哪些信息在英国市场有效。同时规划了付费搜索关键词。"}, "27": {"caption": "伦敦的目标客户。"}, "28": {"text": "付费社交广告"}, "29": {"text": "我在 Meta Ads 上投放了一个引流广告和一个转化广告，使用不同的标题和行动号召。与基准相比，CPM 较低，但 CPC 和 CPA 偏高，因此我建议暂停投放，并测试更清晰的行动号召。"}, "30": {"text": "<strong>引流广告</strong>"}, "32": {"text": "<strong>转化广告</strong>"}, "34": {"items": [{"caption": "引流广告。"}, {"caption": "转化广告。"}, {"caption": "分析。"}]}}}, "hanfupedia": {"excerpt": "一个关于汉服历史的移动应用原型，包含时间线、服饰样例、3D 模型和 AR。", "blocks": {"0": {"rows": [["角色", "UX 设计师（个人项目）"], ["背景", "纽约大学课程"], ["工具", "Figma"]]}, "1": {"text": "Hanfupedia_ 是一个关于汉服历史的移动应用，包含服饰样例、时间线和交互式 AR。可以试用 <a class=\"text-link\" href=\"https://www.figma.com/proto/RoVHU7eD4IHvMj6igEBtVG/Hanfupedia_?type=design&node-id=25-26&t=vsg3t1Yl7e1divlP-1&scaling=scale-down&page-id=0%3A1&starting-point-node-id=25%3A26\" target=\"_blank\" rel=\"noopener\">Figma 原型</a>。"}, "2": {"text": "简介"}, "3": {"text": "汉服泛指汉族的传统服饰，如今在中国正在复兴，从电视剧到街头的汉服体验随处可见。历史上的汉服和当代汉服很难区分，因此这个应用把历史与更贴近流行文化的国潮区分开来，把历史汉服当作文物来记录。"}, "4": {"text": "Hanfupedia_ 以教育为目的。它是交互式的，但不是社交媒体意义上的互动，没有聊天或转发；用户是与 3D 模型和 AR 功能互动。"}, "5": {"caption": "网站地图和线框图。"}, "6": {"text": "品牌"}, "7": {"items": [{"caption": "配色。"}, {"caption": "字体。"}]}, "8": {"text": "原型"}, "9": {"caption": "迭代与交互研究。"}, "10": {"items": [{"caption": "首页：翻转卡片介绍汉服的基本知识。"}, {"caption": "AR：打开相机后，AR 会标注画面中汉服的特征。"}, {"caption": "汉服样例图库。"}, {"caption": "详情页：可旋转的单件汉服 3D 模型。"}]}}}, "social-inequality": {"title": "后新石器时代的社会不平等", "excerpt": "一份复现后新石器时代社会不平等研究的实验报告，分析在 R 中完成。", "blocks": {"0": {"rows": [["角色", "研究者（个人项目）"], ["背景", "纽约大学课程"], ["工具", "R"]]}, "1": {"text": "一份复现后新石器时代社会不平等研究的实验报告，分析与可视化均在 R Studio 中完成。"}, "2": {"caption": "实验报告。"}, "3": {"caption": "R Studio 中的代码（部分）。"}}}, "toppings-on-pizza": {"title": "披萨配料：菠萝？", "excerpt": "一个按受欢迎程度和营养价值比较披萨配料的 Tableau 仪表盘。", "blocks": {"0": {"rows": [["角色", "数据分析（个人项目）"], ["背景", "Podium Education 数据分析项目"], ["工具", "Tableau"]]}, "1": {"text": "一个按受欢迎程度和营养价值比较披萨配料的数据可视化。"}, "3": {"text": "在 Tableau Public 上查看<a class=\"text-link\" href=\"https://public.tableau.com/app/profile/evaine.sun/viz/Milestone9_17029123592550/Dashboard?publish=yes\" target=\"_blank\" rel=\"noopener\">交互式仪表盘</a>。"}}}, "machu-picchu": {"excerpt": "一个介绍马丘比丘（Machu Picchu）的发现、过去与现在的网站，用 HTML 和 CSS 制作。", "blocks": {"0": {"rows": [["角色", "网页设计与开发（个人项目）"], ["背景", "纽约大学课程"], ["工具", "HTML/CSS"]]}, "1": {"text": "一个介绍马丘比丘（Machu Picchu）的发现、过去与现在的网站，用 HTML 和 CSS 制作。"}, "3": {"text": "访问<a class=\"text-link\" href=\"https://eevvaaiinnee.github.io/Machu-Picchu/index.html\" target=\"_blank\" rel=\"noopener\">网站</a>。"}}, "title": "马丘比丘（Machu Picchu）"}, "interactive-silk-road": {"excerpt": "我们的纽约大学毕业项目：一件多感官装置，以激光雕刻亚克力、全息影像、投影映射、刺绣和实物样本，重现丝绸之路四个地区的文物。", "blocks": {"0": {"rows": [["角色", "与合作者共同创作；主导文物的数字重现"], ["背景", "纽约大学本科毕业项目（合作）"], ["工具", "Nikon D850、RealityCapture、Autodesk Maya、Blender、MapMap、Adobe Premiere Pro、Adobe Illustrator、Canva、PFAFF、Inkscape、Premier+2、Epilog Laser、实物材料"]]}, "1": {"text": "互动丝绸之路（Interactive Silk Road）是一件实体与数字交汇的多感官装置。它涵盖丝绸之路的四个地区，每个地区展示具有代表性的文物，其中许多以雕刻亚克力和全息影像重现，另有实物样本和刺绣织物。这是我和合作者的毕业项目。我主要负责文物的虚拟呈现：定光佛的摄影测量模型、雕刻亚克力上的投影映射，以及拼插亚克力的全息影像。刺绣、展览物料和布展由我们共同完成。"}, "2": {"text": "完整内容请见<a class=\"text-link\" href=\"https://docs.google.com/presentation/d/15ANa1y2N2-Cqh0eUPuJKcFP88EnwlkNLeXY9J4hJGg8/edit?usp=sharing\" target=\"_blank\" rel=\"noopener\">项目计划</a>和<a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Interactive-Silk-Road-19146d3d63298082a0bbe63b0420300d\" target=\"_blank\" rel=\"noopener\">过程网站</a>。"}, "3": {"text": "研究"}, "4": {"text": "项目以保护与可及性为出发点。借鉴数字博物馆和虚拟博物馆的理念，它将数字与实体体验结合，加深人们与文化遗产的联系，提高对历史的认识，并挑战与文化、国家和身份相关的刻板印象和偏见，让更多观众获得更具体、更有意义的体验。我们研究了丝绸之路沿线的文物，以及每件文物可以如何呈现。"}, "5": {"items": [{"caption": "丝绸之路四个地区的大致划分。"}, {"caption": "各地区展示文物的初步列表。"}, {"caption": "关于文物、丝绸之路和呈现方式的研究。"}]}, "6": {"text": "展出的文物："}, "7": {"items": ["佛像：定光佛（雕刻亚克力与摄影测量）", "骆驼铃（拼插亚克力与全息影像）", "石窟壁画：反弹琵琶（雕刻亚克力与投影映射）", "葡萄（实物样本）", "伊斯兰书法（雕刻亚克力与投影映射）", "玉：和田玉（装在亚克力容器中的实物样本）", "金属器：哥特式圣杯（拼插亚克力与全息影像）", "瓷器：花瓶（拼插亚克力与全息影像）", "丝绸：莲花纹样（刺绣）", "香料：干青柠、漆树果、golpar、孜然（装在亚克力容器中的实物样本）", "茶：绿茶、红茶、乌龙茶、白茶（装在亚克力容器中的实物样本）", "羊毛（编织）"]}, "8": {"text": "雕刻亚克力与摄影测量"}, "9": {"text": "北魏（386–534）的<a class=\"text-link\" href=\"https://www.metmuseum.org/art/collection/search/42719\" target=\"_blank\" rel=\"noopener\">定光佛</a>陈列于大都会艺术博物馆（The Met Fifth Avenue）206 展厅。合作者在亚克力上雕刻了它的轮廓，我在现场用摄影测量采集佛像，在 RealityCapture 中处理模型，并在 Blender 中加入溶解效果。更多内容请见<a class=\"text-link\" href=\"#project-03\">定光佛项目页面</a>和<a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Buddha-Dipankara-1a346d3d6329808fa0a6e71eb695d99b\" target=\"_blank\" rel=\"noopener\">过程笔记</a>。"}, "10": {"items": [{"caption": "参考。"}, {"caption": "激光切割亚克力（合作者）。"}]}, "11": {"caption": "现场摄影测量与 RealityCapture 中的模型处理（Evaine）。"}, "12": {"caption": "渲染细节、Blender 中带溶解效果的点云，以及最终视频（Evaine）。"}, "13": {"text": "雕刻亚克力与投影映射"}, "14": {"text": "莫高窟的<a class=\"text-link\" href=\"https://en.m.wikipedia.org/wiki/File:Mogao_Caves_Pipa-Player.jpg\" target=\"_blank\" rel=\"noopener\">反弹琵琶</a>壁画，以及大都会艺术博物馆所藏《古兰经》抄本（约 1180 年）中的一页<a class=\"text-link\" href=\"https://www.metmuseum.org/essays/calligraphy-in-islamic-art\" target=\"_blank\" rel=\"noopener\">伊斯兰书法</a>，由合作者在 Illustrator 中描摹并激光切割成亚克力。随后我在 MapMap 中从背后进行投影映射。详见<a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Cave-Art-Islamic-Calligraphy-1ad46d3d63298052a2d0fbe54b5046c7\" target=\"_blank\" rel=\"noopener\">过程笔记</a>。"}, "15": {"items": [{"caption": "反弹琵琶参考图。"}, {"caption": "激光切割亚克力（合作者）。"}]}, "16": {"caption": "在 MapMap 中进行投影映射（Evaine）。"}, "17": {"text": "拼插亚克力与全息影像"}, "18": {"text": "三件文物以拼插的亚克力轮廓搭配全息影像重现：一件钧窑月白釉玉壶春<a class=\"text-link\" href=\"https://sketchfab.com/3d-models/aae4782772e947dca3bf182bb6ab3735\" target=\"_blank\" rel=\"noopener\">瓶</a>、米胡夫地区博物馆（Museum of Ziemia Miechowska）收藏的一只<a class=\"text-link\" href=\"https://muzea.malopolska.pl/en/objects-list/2979\" target=\"_blank\" rel=\"noopener\">哥特式圣杯</a>（约 1500 年），以及杜克大学收藏的一只来自阿富汗的<a class=\"text-link\" href=\"https://sites.duke.edu/dumic/instruments/percussion/middle-east/camel-bell/\" target=\"_blank\" rel=\"noopener\">骆驼铃</a>。合作者设计并激光切割了亚克力，我在 Maya 中拼合或建模每件文物，优化灯光，渲染转台动画，并制作了全息箱的原型。详见<a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Porcelain-Vase-Gothic-Chalice-Camel-Bell-1aa46d3d632980988cf5c0d15b8f5ee0\" target=\"_blank\" rel=\"noopener\">过程笔记</a>。"}, "19": {"items": [{"caption": "参考。"}, {"caption": "激光切割亚克力（合作者）。"}]}, "20": {"caption": "全息影像（Evaine）。"}, "21": {"text": "刺绣与编织"}, "22": {"text": "我们从零开始学习刺绣，重现了北京艺术博物馆所藏明代（1368–1644）的<a class=\"text-link\" href=\"https://eevvaaiinnee.notion.site/Lotus-Pattern-1b046d3d632980069a9fc16fc08e6455\" target=\"_blank\" rel=\"noopener\">莲花纹样</a>：在 Illustrator 中描摹图像，在 Inkscape 中分层，在 Premier+2 中设置，再用 PFAFF 绣花机分段绣制，最后拼成一件参观者可以触摸的作品。羊毛部分，一段编织好的毛线放在 3D 打印的织机上，参观者可以继续编织。"}, "23": {"items": [{"caption": "参考。"}, {"caption": "在 3D 打印的织机上编织。"}]}, "24": {"caption": "刺绣过程。"}, "25": {"text": "实物样本与亚克力容器"}, "26": {"text": "参观者可以品尝葡萄、触摸和田玉、闻香料（干青柠、漆树果、golpar、孜然）和茶叶（绿茶、红茶、乌龙茶、白茶），它们装在 合作者制作的激光切割亚克力容器中。"}, "27": {"caption": "激光切割亚克力容器（合作者）。"}, "28": {"text": "展览物料"}, "29": {"text": "我们为每件文物、香料和茶叶设计了标签，背面印有互动提示；还设计了一份折页：正面介绍每件文物，背面标出它们在四个展框中的位置。另有一段<a class=\"text-link\" href=\"https://youtu.be/BR9fPGQsWxg\" target=\"_blank\" rel=\"noopener\">语音导览</a>。"}, "30": {"caption": "文物标签。"}, "31": {"caption": "折页。"}, "32": {"text": "布展"}, "33": {"text": "我们先做了装置的模型，在弱光下测试，并确定展框位置：每个展框 65 × 32 英寸，整体占地长 10 英尺、深 7 英尺、高 6 英尺，然后在展览当天完成布展。"}, "34": {"items": [{"caption": "装置模型。"}, {"caption": "布展。"}, {"caption": "展览开始前。"}]}, "35": {"caption": "展览当天。"}, "36": {"text": "反思"}, "37": {"text": "整个学期 合作者和我紧密合作，在 370 Jay Street 和 Makerspace 构思、熬夜，因为知道这是我们本科的最后一个项目而格外有动力。我们学会了新技能，比如从零开始刺绣；用日历管理每个部分；争取到经费；从各个实验室搬运材料；在最初的想法行不通时寻找替代方案。用鱼线悬挂较重的作品比预想的难，回头看，如果当时更仔细地规划灯光和动线，参观者就能更好地看到每件文物。这个项目让我们学到了展览设计、项目管理和实际布展，也让我们感到满足并充满动力。"}, "38": {"text": "感谢我们的导师 Carla、同学和朋友们、纽约大学坦登工程学院本科教务处（NYU Tandon Undergraduate Academics），以及 IDM 专业。"}}, "title": "互动丝绸之路"}, "walligraphy": {"excerpt": "一面由我的书法作品拼贴成的墙，许多是我喜欢的古诗词，其中一些还做成了 3D 打印的印章。", "blocks": {"0": {"rows": [["角色", "书法（个人项目）"], ["背景", "个人项目"], ["工具", "书法"]]}, "1": {"text": "Walligraphy 是一组精选书法作品的拼贴，挂在我卧室的墙上。我用传统毛笔尝试了多种书体和风格。许多内容是我喜欢的句子，其中不少出自中国古诗词。"}, "2": {"text": "书法"}, "4": {"text": "印章"}, "5": {"text": "部分书法被数字化为 3D 模型，并 3D 打印成印章。"}}}, "houyi-shoots-the-sun": {"title": "后羿射日", "excerpt": "重述中国神话，结合 Unreal Engine 虚拟制作与 AI 风格迁移。我负责第一幕：十日并出的时刻。", "blocks": {"0": {"rows": [["角色", "第一幕创作者（合作项目）"], ["背景", "纽约大学课程"], ["工具", "Unreal Engine、Max、Pinokio、ComfyUI、Adobe After Effects"]]}, "1": {"text": "《后羿射日》是一部根据同名中国古代神话创作的合作作品，结合了 Unreal Engine 中的场景构建与 AI 驱动的风格迁移。我负责第一幕：十个太阳同时升起，酷热让人们陷入绝望。我在 Unreal Engine 中搭建场景，并在 Max 中编排演出控制。"}, "3": {"text": "故事线"}, "4": {"items": ["十日并出，大地焦灼，庄稼枯死，人们纷纷倒下", "猛兽与怪鸟逃离干涸的河流与燃烧的森林，村民惊慌奔逃", "后羿奉天帝之命从天宫降临", "后羿张弓射下九个太阳，只留一个，村民欢庆"]}, "5": {"text": "场景搭建"}, "6": {"text": "场景布局为：后方是后羿降临的山，右侧是猛兽出没的森林，左侧是村庄，使用了 Fab 上的<a class=\"text-link\" href=\"https://www.fab.com/listings/250a5622-d5fd-49fc-b1c4-0550a444e117\" target=\"_blank\" rel=\"noopener\">村庄模型</a>和<a class=\"text-link\" href=\"https://www.fab.com/listings/d49af8e0-b16c-4f1f-849f-48b30bd59740\" target=\"_blank\" rel=\"noopener\">农民模型</a>。蓝图让火燃烧起来、让村民倒地，再由 Max patcher 作为演出控制来触发。"}, "7": {"items": [{"caption": "草稿 1：初步场景布局。"}, {"caption": "草稿 2：修改后的场景。"}]}, "8": {"caption": "火焰蓝图：事件图表与视口。"}, "9": {"caption": "村民蓝图：事件图表与视口。"}, "10": {"caption": "演出控制的 Max patcher。"}, "11": {"text": "最终场景"}, "13": {"text": "风格迁移与视效"}, "14": {"text": "为了给画面重新上风格，我在 Pinokio（Fluxgym）中训练了角色和风格的 LoRA 模型，并在 ComfyUI 中使用；然后用 Viggle 迁移角色、用 EbSynth 迁移背景、用 Adobe Firefly 迁移服装，最后在 After Effects 中合成。"}, "15": {"caption": "LoRA 训练与 ComfyUI 设置。"}, "16": {"caption": "视效拆解。"}}}, "fishing-day": {"excerpt": "一部 Minecraft 主题的动态图形视频，以复古纸拼贴舞台剧的风格，讲述我的游戏角色在雨天钓鱼的一天。", "blocks": {"0": {"rows": [["角色", "动态设计（个人项目）"], ["背景", "利兹国际暑期学校（Leeds International Summer School）课程"], ["工具", "Adobe After Effects、Canva"]]}, "1": {"text": "钓鱼日（Fishing Day）是一部 Minecraft 主题的动态图形视频，采用复古纸拼贴舞台剧的风格，讲述我的游戏角色在雨天钓鱼的经历，还原了游戏中经典的互动和音效。"}, "3": {"text": "制作"}, "4": {"text": "我在 Canva 中编辑了 <a class=\"text-link\" href=\"https://mcasset.cloud/\" target=\"_blank\" rel=\"noopener\">Minecraft 素材</a>，以及<a class=\"text-link\" href=\"https://www.seekpng.com/ipng/u2w7e6r5q8e6w7i1_torn-paper-png-clipart-best-ripped-paper/\" target=\"_blank\" rel=\"noopener\">撕纸边缘</a>、<a class=\"text-link\" href=\"https://ar.inspiredpencil.com/pictures-2023/dogs-minecraft\" target=\"_blank\" rel=\"noopener\">小狗</a>和<a class=\"text-link\" href=\"https://clipart-library.com/theatre-curtains.html\" target=\"_blank\" rel=\"noopener\">剧场幕布</a>的图片，然后在 After Effects 中配合 <a class=\"text-link\" href=\"https://archive.org/details/minecraft_ost/minecraft.mp3\" target=\"_blank\" rel=\"noopener\">Minecraft 原声</a>、<a class=\"text-link\" href=\"https://minecraft.fandom.com/wiki/category:sound_effects\" target=\"_blank\" rel=\"noopener\">Minecraft 音效</a>和<a class=\"text-link\" href=\"https://freesound.org/people/tompallant/sounds/208723/\" target=\"_blank\" rel=\"noopener\">幕布音效</a>制作动画。"}, "5": {"items": [{"caption": "素材准备与布局预览。"}, {"caption": "动态图形制作。"}]}}, "title": "钓鱼日"}, "quiet-time-room": {"excerpt": "一个娃娃屋风格的 3D 房间，在 Autodesk Maya 中建模并打光。", "blocks": {"0": {"rows": [["角色", "3D 建模（个人项目）"], ["背景", "纽约大学课程"], ["工具", "Autodesk Maya"]]}, "1": {"text": "静谧时光小屋（Quiet Time Room）是一个娃娃屋风格的 3D 房间，在 Autodesk Maya 中建模并配合灯光渲染。"}, "2": {"text": "参考图"}, "3": {"text": "这个房间参考了 <a class=\"text-link\" href=\"https://www.etsy.com/listing/836203751/\" target=\"_blank\" rel=\"noopener\">Etsy 上的一款娃娃屋</a>。"}, "5": {"text": "制作过程"}, "6": {"text": "我先用简单的形体搭出家具，再逐一细化建模，加入物体灯光和环境光，最后在渲染前调整灯光和细节。"}, "7": {"caption": "第一步：用简单的形体搭出墙面、地板和主要物体。"}, "8": {"caption": "第二步：为每个物体建模细节。"}, "9": {"caption": "第三步：为场景加入物体灯光和环境光。"}, "10": {"caption": "第四步：在最终渲染前调整灯光和细节。"}, "11": {"text": "最终场景"}, "12": {"caption": "作品的不同角度。"}, "13": {"caption": "作品的不同视图。"}, "14": {"caption": "最终渲染。"}}, "title": "静谧时光小屋"}, "electromagnetic-gun": {"title": "电磁枪", "excerpt": "动画《灵笼》中一件武器的 3D 模型，在 Autodesk Maya 中建模并完成 UV 展开。", "blocks": {"0": {"rows": [["角色", "3D 建模（个人项目）"], ["背景", "纽约大学课程"], ["工具", "Autodesk Maya"]]}, "1": {"text": "电磁枪是动画<a class=\"text-link\" href=\"https://www.imdb.com/title/tt10827146/\" target=\"_blank\" rel=\"noopener\">《灵笼》</a>中一件武器的 3D 模型，并完成了 UV 展开。"}, "2": {"text": "参考图"}, "3": {"text": "我参考了动画中这件武器的截图，以及<a class=\"text-link\" href=\"https://www.zcool.com.cn/work/ZMzg0NDM0NTI=.html\" target=\"_blank\" rel=\"noopener\">站酷上的一个 3D 模型</a>。"}, "5": {"text": "制作过程"}, "6": {"text": "我先为主要部件建模，再制作带保护边的小部件，并边做边为每个部件重命名。之后展开每个部件的 UV，调整 UV 壳的比例，并把所有 UV 壳排进同一个区域。"}, "7": {"caption": "第一步：按比例为主要部件建模。"}, "8": {"caption": "第二步：为小部件建模，添加保护边并为每个部件重命名。"}, "9": {"caption": "第三步：UV 展开，展开每个部件、调整比例并排进同一个区域。"}, "10": {"text": "最终场景"}, "11": {"text": "完成的模型，从不同角度渲染。"}, "12": {"caption": "作品的不同角度。"}, "13": {"caption": "作品的不同视图。"}}}, "resonance-ensemble": {"excerpt": "一个让世界各地的人共同演奏一首乐曲的协作网页游戏，把嫉妒这一烦恼从比较转化为欣赏。", "blocks": {"0": {"rows": [["角色", "开发者"], ["背景", "数字曼荼罗实验室学生工作坊（合作）"], ["工具", "Claude"]]}, "1": {"text": "嫉妒这一烦恼"}, "2": {"text": "为了呈现<a class=\"text-link\" href=\"https://rubinmuseum.org/mandala-lab/our-inspiration/\" target=\"_blank\" rel=\"noopener\">嫉妒这一烦恼（klesha）</a>，我们小组设计了一个活动：通过一个协作的管弦乐网页界面，把比较与竞争的情绪转化为集体创作。"}, "3": {"text": "玩法"}, "4": {"text": "玩家用手机或电脑加入一个实时房间，与世界各地的其他在线参与者一起，可以自选房间，也可以随机分配。每位玩家随机获得一种乐器，在乐曲开始前按空格键或轻触屏幕准备。"}, "5": {"items": [{"caption": "首页。"}, {"caption": "等候室：玩家在乐曲开始前做好准备。"}]}, "6": {"text": "之后，每个人随着屏幕上出现的音符演奏自己的声部。大家不是互相比拼，而是各自贡献一个只有与其他人合在一起才有意义的声部。加入的人越多，乐曲就越和谐清晰，偶尔漏掉的音符则体现了人类演奏共同而不完美的本质。玩家也可能中途退出，这会影响团队的总连击数。"}, "7": {"caption": "一起演奏：每位玩家随着音符出现演奏自己的声部。"}, "8": {"text": "最后，屏幕会显示团队共同达到的最高连击。集体奏乐鼓励玩家练习把比较转化为欣赏。"}, "9": {"caption": "显示团队最高连击的结束画面。"}, "10": {"text": "我的角色"}, "11": {"text": "作为小组的开发者，我用 Claude 搭建了可玩的网页原型，包括电脑和手机上的玩法、房间分配，以及玩家之间的音符同步。"}, "12": {"text": "下一步"}, "13": {"items": ["让玩家收听或下载共同完成的乐曲", "支持更多实时参与者", "加入动画，例如用发光的点代表在线玩家，强化共享、同步的体验", "与其他烦恼以及更广的曼荼罗实验室（Mandala Lab）体验相连接"]}, "14": {"text": "在手机或电脑上试玩：<a class=\"text-link\" href=\"https://eevvaaiinnee.github.io/resonance-ensemble-updated/\" target=\"_blank\" rel=\"noopener\">eevvaaiinnee.github.io/resonance-ensemble-updated</a>。"}}, "title": "共鸣乐团"}, "modular-font": {"title": "模块化字体", "excerpt": "一款完全由圆形和方形构成的字体，在 Adobe Illustrator 中设计。", "blocks": {"0": {"rows": [["角色", "设计师（个人项目）"], ["背景", "纽约大学课程"], ["工具", "Adobe Illustrator"]]}, "1": {"text": "模块化字体是我在 Adobe Illustrator 中设计的一款字体，完全由圆形和方形构成。"}, "2": {"caption": "最终的模块化字体。"}, "3": {"text": "制作过程"}, "4": {"caption": "制作中。"}}}, "acrylic-paintings": {"title": "丙烯画", "excerpt": "2022 年夏天创作的一组丙烯画，尝试在抽象形式中进行色彩混合。", "blocks": {"0": {"rows": [["角色", "画家（个人项目）"], ["背景", "个人项目"], ["工具", "丙烯颜料"]]}, "1": {"text": "2022 年夏天，我创作了一组丙烯画，尝试在抽象形式中进行色彩混合。"}, "2": {"text": "作品"}, "3": {"items": [{"caption": "雨夜"}, {"caption": "风暴"}, {"caption": "雾林"}, {"caption": "草莓奶昔山"}, {"caption": "红与蓝的碰撞"}]}}}, "tianzige": {"title": "田字格公益官方网站", "excerpt": "在三个月的实习中，根据团队的设计搭建田字格公益改版后的官方网站。田字格是一家致力于乡村教育公平的上海非营利组织。", "blocks": {"0": {"rows": [["角色", "实习生，网站实施"], ["背景", "田字格公益实习"], ["工具", "凡科网（jz.fkw.com）"]]}, "1": {"text": "关于田字格"}, "2": {"text": "田字格公益是 2010 年在上海成立的民办非营利组织，开展乡土人本教育项目，致力于推动乡村教育公平。"}, "3": {"text": "网站"}, "4": {"text": "实习期间，我负责搭建机构改版后的官方网站，更新品牌形象和信息。团队已将页面设计成矢量文件，我在建站平台<a class=\"text-link\" href=\"https://jz.fkw.com/\" target=\"_blank\" rel=\"noopener\">凡科网</a>上实现，并与团队保持密切沟通，在保持品牌一致的前提下，根据真实网站的需要调整设计。"}, "5": {"caption": "田字格公益官方网站。"}, "6": {"text": "访问网站：<a class=\"text-link\" href=\"https://tianzigengo.com/en/\" target=\"_blank\" rel=\"noopener\">tianzigengo.com</a>。"}}}, "drift-city": {"excerpt": "一个追踪物品如何在城市中从一个陌生人传到另一个陌生人手中的网页应用，灵感来自人们传递一次性相机。在 Google AI Builder Day 上用 Gemini 氛围编程完成。", "blocks": {"0": {"rows": [["角色", "设计与开发（个人项目）"], ["背景", "纽约大学坦登工程学院的 Google AI Builder Day"], ["工具", "Gemini、AI Studio"]]}, "1": {"text": "灵感"}, "2": {"text": "漂流之城（Drift City）源于社交媒体上的一个现象：陌生人之间传递一台一次性相机，每人拍几张再交给下一个人。我想在这种社区联结与线上线下混合互动的感觉上进一步延伸。"}, "3": {"text": "想法"}, "4": {"text": "漂流之城追踪实体物品在城市中从一个陌生人传到另一个陌生人手中的过程。每件漂流的物品，比如一只布莱恩特公园（Bryant Park）小鸭或一台下城（Downtown）胶片相机，都有自己的线索：一条由所有发现并传递过它的人组成的链条。"}, "5": {"text": "我在纽约大学坦登工程学院的 Google AI Builder Day 上，通过向 Gemini 和 AI Studio 发送提示，氛围编程完成了这个原型。这是一场围绕这种创作方式举办的黑客松。"}, "6": {"caption": "首页。"}, "7": {"text": "地图视图"}, "8": {"text": "交互式地图会画出每件物品的完整轨迹，连接它去过的每个地方，例如从布莱恩特公园（Bryant Park）到华盛顿广场公园（Washington Square Park），再到高线公园（High Line）。"}, "9": {"caption": "一件物品在纽约市的移动轨迹地图。"}, "10": {"text": "线索"}, "11": {"text": "每件物品的线索就像一条时间线，按时间顺序显示每次传递的照片、时间、发现者留言和地点。"}, "12": {"items": [{"caption": "日志视图。"}, {"caption": "单件物品的线索。"}]}, "13": {"text": "发现与传递"}, "14": {"text": "当有人发现一件物品并把它传递下去时，就会记录一次“发现与传递”：一张带预览的照片、当前位置（输入或在地图上放置标记）以及一段说明。"}, "15": {"items": [{"caption": "记录一次“发现与传递”。"}, {"caption": "个人主页。"}]}, "16": {"text": "试用演示：<a class=\"text-link\" href=\"https://eevvaaiinnee.github.io/drift-city/\" target=\"_blank\" rel=\"noopener\">漂流之城</a>。"}}, "title": "漂流之城"}, "square-clock": {"title": "方块生成时钟", "excerpt": "一个用方块表示小时、用四分之一格表示一刻钟的另类时钟，先后受 Julie Mehretu 的 Stadia II 和 Frank Gehry 的 Lou Ruvo 脑健康中心启发。", "blocks": {"0": {"rows": [["角色", "设计与创意编程（个人项目）"], ["背景", "纽约大学课程"], ["工具", "p5.js（JavaScript）"]]}, "1": {"text": "重现 Stadia II"}, "2": {"text": "在课程中一个专注于形式与视觉系统的阶段，我用几何系统尽可能准确地重现了 Julie Mehretu 的 <a class=\"text-link\" href=\"https://artsandculture.google.com/asset/stadia-ii-julie-mehretu/lAHqEFaUfsrZ1w\" target=\"_blank\" rel=\"noopener\"><em>Stadia II</em></a>（2004 年，布面墨水与丙烯，卡内基艺术博物馆藏）的一部分。构图是设计决策的重要组成部分，这个练习也让我练习了在 p5.js 中精确定位。"}, "3": {"items": [{"caption": "参考：Julie Mehretu 的 Stadia II 局部。"}, {"caption": "我的几何重现。"}]}, "4": {"text": "随机方块生成时钟"}, "5": {"text": "在这个构图的基础上，我设计了一个用方块报时的另类时钟。一个实心大方块代表一小时，一个四分之一格代表 15 分钟，图形每秒随机重排一次。例如下午 1:45，时钟会显示 12 个实心大方块和 3 个实心四分之一格。"}, "6": {"caption": "最初的随机方块生成时钟。"}, "7": {"text": "更新时钟"}, "8": {"text": "对原版的反馈是视觉上过于繁杂。在新版本中，每个方块和四分之一格填满后会切换配色，每个四分之一格只容纳两个图形：半圆或三角形。"}, "9": {"text": "我还借鉴了课上的一个图像解构练习，以及 Frank Gehry 在拉斯维加斯设计的 <a class=\"text-link\" href=\"https://en.wikipedia.org/wiki/Cleveland_Clinic_Lou_Ruvo_Center_for_Brain_Health\" target=\"_blank\" rel=\"noopener\">Cleveland Clinic Lou Ruvo Center for Brain Health</a>，我把它理解为对扭曲、连续而人工的时间的表达。每个四分之一格仍代表 15 分钟，闪烁三次后变成实心的强调色。由于并非每个四分之一格都有图形，有些闪烁是看不见的，因此整个系统呈现出不一致、扭曲的时间。每个方块中的图形沿对角线对称以表现连续性，并使用规则图形来表现人工感。"}, "10": {"items": [{"caption": "参考：Lou Ruvo 脑健康中心。"}, {"caption": "更新后的方块生成时钟。"}]}, "11": {"text": "在 p5.js 编辑器中试用时钟：<a class=\"text-link\" href=\"https://editor.p5js.org/js12353/sketches/B_K83A0XQ\" target=\"_blank\" rel=\"noopener\">新版方块生成时钟</a>和<a class=\"text-link\" href=\"https://editor.p5js.org/js12353/sketches/JpFySY6Gz\" target=\"_blank\" rel=\"noopener\">原版</a>。"}}}, "charity-water": {"title": "charity: water 营销活动", "excerpt": "在 Podium Education 数字营销项目中制定的活动方案，通过重新设计落地页、社交内容、网红合作和广告，鼓励大学生每月向 charity: water 捐赠 1 美元。", "blocks": {"0": {"rows": [["角色", "数字营销（个人项目）"], ["背景", "Podium Education 数字营销项目"], ["工具", "Google Optimize、Google Ads、Meta Ads、Sprout Social、Insense"]]}, "1": {"text": "活动简报"}, "2": {"text": "charity: water 的月捐项目 The Spring 有超过 6 万名捐赠者，但大学生不到 2%。目标：让 2,000 名大学生每月至少捐赠 1 美元。"}, "3": {"text": "策略是重新设计 The Spring 的落地页以吸引学生，再通过自然社交内容、网红营销和付费广告引流。目标受众：美国文理学院的学生，尤其是社会活动氛围浓厚的学校中，关心社会行动、非营利组织、水资源政策或环境的学生。长期来看，活动希望发展一个在校园内组织活动的学生网络。"}, "4": {"text": "阅读完整的活动简报：<a class=\"text-link\" href=\"https://docs.google.com/document/d/16OGPgHgNb-p7RJxAPcF23Jb_IBA2uG6uvFEVTGKFkVQ/edit\" target=\"_blank\" rel=\"noopener\">Activating the Next Generation of charity: water Supporters</a>。"}, "5": {"text": "落地页"}, "6": {"items": [{"caption": "The Spring 落地页的原始设计。"}, {"caption": "我的重新设计。"}]}, "7": {"text": "重新设计缩短了副标题，保留了统计数据句，因为学生可能会对量化证据有所回应；把行动号召收窄为一个按钮，并把默认捐款设为 1 美元，降低开始捐赠的门槛。"}, "8": {"text": "自然社交内容"}, "9": {"text": "Instagram 内容分为三大支柱。这些是为项目制作的样稿，因此图片与文字并不对应。"}, "10": {"items": [{"caption": "水项目与受助者故事，例如埃塞俄比亚孔索（Konso）的一口钻井。"}, {"caption": "关于我们与幕后，例如一个项目是如何完成的。"}, {"caption": "参与方式与捐赠者故事，例如一位捐赠者用小吃摊筹款。"}]}, "11": {"text": "网红营销"}, "12": {"text": "在 TikTok 上，计划与美国本土的微型网红（1 千到 50 万粉丝）合作，最好与美国高校有关联，并对公益、水资源、环境或社会行动感兴趣。"}, "13": {"text": "内容指南要求准确介绍水危机和地区水资源政策，简要介绍 charity: water 并展示其标志，配上清晰的行动号召；语气真诚、充满希望且信息充分，不夸大，也不居高临下。"}, "15": {"text": "付费社交广告"}, "16": {"text": "两组 Meta 广告素材：一组按兴趣定向，触达符合目标受众的学生；另一组再营销广告，面向已经有过互动的人。"}, "17": {"items": [{"caption": "兴趣定向广告素材。"}, {"caption": "再营销广告素材。"}]}, "18": {"text": "大使计划"}, "19": {"text": "为了让学生在活动之后继续参与，大使计划将与学生组织合作，举办关于非营利组织和水危机的线上讲座，并开展主题筹款活动，例如围绕世界水日。"}}}, "chile-2026": {"title": "智利", "excerpt": "寒假的智利之旅。这是我离南极最近的一次。", "blocks": {"0": {"items": {"0": {"location": "智利纳塔莱斯港（Puerto Natales）"}, "1": {"location": "智利麦哲伦大区（Magallanes） · 米洛登洞穴（Cueva del Milodón）、百内国家公园（Torres del Paine National Park）"}, "2": {"location": "智利圣地亚哥"}, "3": {"location": "智利圣佩德罗-德阿塔卡马（San Pedro de Atacama） · 埃尔塔蒂奥间歇泉（El Tatio Geysers）"}, "4": {"location": "智利安托法加斯塔（Antofagasta）"}, "5": {"location": "美国佛罗里达州基韦斯特（Key West）"}, "6": {"location": "美国佛罗里达州迈阿密"}}}}}, "pennsylvania-2026": {"title": "美国宾夕法尼亚州吉姆索普（Jim Thorpe）", "excerpt": "春假的吉姆索普（Jim Thorpe）短途旅行。", "blocks": {"0": {"items": {"0": {"location": "宾夕法尼亚州利哈伊顿（Lehighton） · 波霍波科溪羊驼农场（Pohopoco Creek Alpacas）、贝尔茨维尔州立公园（Beltzville State Park）"}, "1": {"location": "宾夕法尼亚州吉姆索普（Jim Thorpe）"}}}}}, "hawaii-2026": {"title": "美国夏威夷", "excerpt": "毕业公路旅行，去了大岛和檀香山。", "blocks": {"0": {"items": {"0": {"location": "夏威夷大岛 · 阿卡卡瀑布（ʻAkaka Falls）、夏威夷热带植物园（Hawaiʻi Tropical Botanical Garden）"}, "1": {"location": "夏威夷大岛 · 莫纳克亚山（Maunakea）"}, "2": {"location": "夏威夷大岛夏威夷火山国家公园（Hawaiʻi Volcanoes National Park） · 霍莱海拱（Hōlei Sea Arch）"}, "3": {"location": "夏威夷大岛科纳（Kona） · 格林威尔农场（Greenwell Farms）"}, "4": {"location": "瓦胡岛（Oʻahu Island） · 霍奥马卢希亚植物园（Hoʻomaluhia Botanical Garden）、古兰尼牧场（Kualoa Ranch）"}, "5": {"location": "瓦胡岛（Oʻahu Island）檀香山 · 钻石头步道（Diamond Head Trail）"}, "6": {"location": "瓦胡岛（Oʻahu Island）檀香山 · 马诺阿瀑布（Mānoa Falls）"}}}}}, "tennessee-2026": {"title": "美国田纳西州", "excerpt": "周末在大烟山国家公园（Great Smoky Mountains National Park）的公路旅行。树叶还没怎么变色。", "blocks": {"0": {"items": {"0": {"location": "大烟山国家公园（Great Smoky Mountains National Park） · 凯兹湾（Cades Cove）"}, "1": {"location": "大烟山国家公园（Great Smoky Mountains National Park） · 库沃希山（Kuwohi）"}}}}}, "new-york-city": {"title": "美国纽约州纽约市", "excerpt": "在纽约市的多次出行。", "blocks": {"0": {"items": {"0": {"location": "古根海姆博物馆（Guggenheim Museum）、大都会艺术博物馆（The Metropolitan Museum of Art）"}, "1": {"location": "时代广场（Times Square）、洛克菲勒中心（Rockefeller Center）、圣帕特里克大教堂（St. Patrick’s Cathedral）"}, "2": {"location": "丹波区（DUMBO）"}, "3": {"location": "丹波区（DUMBO）"}, "4": {"location": "曼哈顿大桥（Manhattan Bridge）"}, "5": {"location": "世界贸易中心（World Trade Center）、纽约证券交易所（New York Stock Exchange）"}, "6": {"location": "美国自然历史博物馆（American Museum of Natural History）"}, "7": {"location": "康尼岛（Coney Island）"}, "8": {"location": "现代艺术博物馆（MoMA）"}, "9": {"location": "古根海姆博物馆（Guggenheim Museum）"}, "10": {"location": "布鲁克林博物馆（Brooklyn Museum）"}, "11": {"location": "大都会艺术博物馆（The Metropolitan Museum of Art）"}, "12": {"location": "美国自然历史博物馆（American Museum of Natural History）、大都会艺术博物馆（The Metropolitan Museum of Art）"}, "13": {"location": "克莱斯勒大厦（Chrysler Building）"}, "14": {"location": "联合国总部（United Nations Headquarters）"}, "15": {"location": "大都会艺术博物馆（The Metropolitan Museum of Art）"}, "16": {"location": "布鲁克林、曼哈顿大桥（Manhattan Bridge）、布鲁克林大桥（Brooklyn Bridge）、自由女神像（Statue of Liberty）"}}}}}, "shanghai": {"title": "上海", "excerpt": "在上海的多次出行。", "blocks": {"0": {"items": {"0": {"location": "上海纽约大学外滩南京东路豫园"}, "1": {"location": "龙华寺"}}}}}, "zhejiang": {"title": "浙江", "excerpt": "在浙江的多次出行。", "blocks": {"0": {"items": {"0": {"location": "金华横店 · 横店影视城"}, "1": {"location": "嘉兴 · 乌镇"}, "2": {"location": "嘉兴 · 月河、南湖、嘉兴博物馆"}, "3": {"location": "嘉兴 · 盐官"}, "4": {"location": "杭州 · 西湖"}, "5": {"location": "嘉兴 · 乌镇"}, "6": {"location": "台州温岭"}, "7": {"location": "丽水庆元 · 百山祖国家公园"}, "8": {"location": "杭州 · 法喜寺、八卦田、西湖"}, "9": {"location": "湖州安吉"}, "10": {"location": "湖州南浔"}, "11": {"location": "金华鸡鸣阁"}, "12": {"location": "金华横店 · 秦王宫、清明上河图、明清故宫"}}}}}, "maine-2025": {"title": "美国缅因州", "excerpt": "秋假的缅因州公路旅行。", "blocks": {"0": {"items": {"0": {"location": "缅因州波特兰 · 波特兰海角灯塔（Portland Head Light）"}, "1": {"location": "缅因州阿卡迪亚国家公园（Acadia National Park） · 巴尔港（Bar Harbor）、桑德海滩（Sand Beach）、雷鸣洞（Thunder Hole）、水獭崖（Otter Cliff）、凯迪拉克山（Cadillac Mountain）"}, "2": {"location": "马萨诸塞州 · 从伊普斯威奇（Ipswich）到波士顿"}}}}}, "ningxia-2025": {"title": "宁夏、甘肃、新疆", "excerpt": "中国西北的公路旅行，还去了哈萨克斯坦。", "blocks": {"0": {"items": {"0": {"location": "从甘肃兰州到宁夏银川"}, "1": {"location": "宁夏吴忠 · 青铜峡"}, "2": {"location": "宁夏银川 · 西夏王陵、镇北堡西部影城"}, "3": {"location": "宁夏银川 · 西夏王陵"}, "4": {"location": "从宁夏银川到甘肃武威 · 腾格里沙漠"}, "5": {"location": "从武威到甘肃张掖"}, "6": {"location": "甘肃张掖 · 马蹄寺、天落城遗址"}, "7": {"location": "甘肃嘉峪关 · 嘉峪关"}, "8": {"location": "甘肃酒泉 · 锁阳城遗址"}, "9": {"location": "从甘肃酒泉到新疆哈密"}, "10": {"location": "从哈密到新疆吐鲁番 · 大海道"}, "11": {"location": "从吐鲁番到新疆新源 · 独库公路"}, "12": {"location": "新疆伊犁 · 那拉提草原"}, "13": {"location": "新疆伊犁 · 那拉提草原、独库公路、唐布拉草原、解忧公主薰衣草园、果子沟大桥"}, "14": {"location": "新疆博尔塔拉蒙古自治州 · 赛里木湖"}, "15": {"location": "新疆伊犁 · 霍尔果斯、哈萨克斯坦"}}}}}, "arizona-2025": {"title": "美国亚利桑那州、加利福尼亚州", "excerpt": "毕业时的美国西部公路旅行。很怀念。", "blocks": {"0": {"items": {"0": {"location": "亚利桑那州 · 羚羊峡谷（Antelope Canyon）、鲍威尔湖（Lake Powell）、马蹄湾（Horseshoe Bend）"}, "1": {"location": "亚利桑那州 · 纪念碑谷（Monument Valley）、阿甘点（Forrest Gump Point）"}, "2": {"location": "加利福尼亚州 · 约书亚树国家公园（Joshua Tree National Park）"}, "3": {"location": "加利福尼亚州洛杉矶 · 圣莫尼卡（Santa Monica）"}, "4": {"location": "加利福尼亚州 · 红杉国家公园（Sequoia National Park）"}, "5": {"location": "加利福尼亚州 · 优胜美地国家公园（Yosemite National Park）"}, "6": {"location": "加利福尼亚州 · 一号公路（Highway 1）、半月湾（Half Moon Bay）"}, "7": {"location": "加利福尼亚州旧金山 · 金门大桥（Golden Gate Bridge）"}}}}}, "new-zealand-2025": {"title": "新西兰", "excerpt": "去新西兰的公益假期之旅。第一次去大洋洲和南半球。", "blocks": {"0": {"items": {"0": {"location": "在飞机上"}, "1": {"location": "奥克兰 · 市中心、银谷（Silverdale）、维塔工作室（Wētā Workshop）"}, "2": {"location": "怀卡托（Waikato） · 霍比屯（Hobbiton）"}, "3": {"location": "科罗曼德尔（Coromandel） · 教堂湾（Cathedral Cove）、热水海滩（Hot Water Beach）"}, "4": {"location": "奥克兰 · 独树山（One Tree Hill）"}, "5": {"location": "奥克兰 · 奥克兰战争纪念博物馆（Auckland War Memorial Museum）"}}}}}, "peru-2025": {"title": "秘鲁", "excerpt": "去秘鲁的公益假期之旅，住在寄宿家庭。终于去了 马丘比丘（Machu Picchu）！", "blocks": {"0": {"items": {"0": {"location": "库斯科（Cusco）"}, "1": {"location": "库斯科（Cusco） · 科里坎查（Qorikancha）、十二角石（Twelve-Angled Stone）"}, "2": {"location": "库斯科（Cusco） · 白色基督像（Cristo Blanco）、萨克塞瓦曼（Saqsaywaman）、库斯科武器广场（Plaza de Armas de Cusco）、耶稣会教堂（Iglesia de la Compañía de Jesús）、库斯科主教座堂（Catedral del Cusco）"}, "3": {"location": "库斯科（Cusco） · 乌曼泰湖（Laguna Humantay）"}, "4": {"location": "乌鲁班巴（Urubamba） · 苏马克·兰凯（Sumaq Llank’ay）、钦切罗（Chinchero）、莫赖（Moray）、马拉斯盐田（Salineras de Maras）、奥扬泰坦博（Ollantaytambo）"}, "5": {"location": "乌鲁班巴（Urubamba） · 马丘比丘（Machu Picchu）、热水镇（Aguas Calientes）、奥扬泰坦博（Ollantaytambo）"}, "6": {"location": "库斯科（Cusco） · 圣布拉斯区（San Blas）"}, "7": {"location": "库斯科（Cusco） · 彩虹山（Vinicunca）"}, "8": {"location": "库斯科（Cusco） · 前哥伦布艺术博物馆（Museo de Arte Precolombino）、巧克力博物馆（ChocoMuseo）"}}}}}, "spanish-fork-2024": {"title": "美国犹他州西班牙福克（Spanish Fork）", "excerpt": "圣诞期间的西班牙福克（Spanish Fork）之旅。", "blocks": {"0": {"items": {}}}}, "philadelphia-2024": {"title": "美国宾夕法尼亚州费城", "excerpt": "秋假的费城之旅。", "blocks": {"0": {"items": {"0": {"location": "纽约州纽约市 · 宾州车站（Penn Station）"}, "1": {"location": "宾夕法尼亚州费城 · 市政厅（City Hall）、爱心公园（LOVE Park）"}, "2": {"location": "宾夕法尼亚州费城 · 独立厅（Independence Hall）、自由钟（Liberty Bell）"}, "3": {"location": "宾夕法尼亚州费城 · 爱心公园（LOVE Park）、费城艺术博物馆（Philadelphia Museum of Art）"}}}}}, "chicago-2024": {"title": "美国伊利诺伊州芝加哥", "excerpt": "去芝加哥参加会议。", "blocks": {"0": {"items": {"0": {"location": "芝加哥"}, "1": {"location": "芝加哥 · 麦考密克会展中心（McCormick Place）"}, "2": {"location": "芝加哥 · 千禧公园（Millennium Park）、麦考密克会展中心（McCormick Place）"}}}}}, "sri-lanka-2024": {"title": "斯里兰卡", "excerpt": "去斯里兰卡的公益假期之旅，也是我的第一次公益假期。", "blocks": {"0": {"items": {"0": {"location": "加勒（Galle） · 德瓦塔海滩（Dewata Beach）、加勒古堡（Galle Fort）"}, "1": {"location": "加勒（Galle） · 加勒古堡（Galle Fort）、乌纳瓦图纳海滩（Unawatuna Beach）"}, "2": {"location": "加勒（Galle） · AASHA 之家（AASHA House）、卡奇瓦塔寺（Kachchiwatta Temple）"}, "3": {"location": "加勒（Galle） · AASHA 之家（AASHA House）"}, "4": {"location": "乌达瓦拉维（Udawalawe） · 乌达瓦拉维国家公园（Udawalawe National Park）"}, "5": {"location": "加勒（Galle） · 加勒古堡（Galle Fort）、荷兰归正会教堂（Dutch Reformed Church）、诸圣教堂（All Saints’ Church）、荷兰老医院（Old Dutch Hospital）、加勒灯塔（Galle Lighthouse）、Stick No Bills 画廊（Stick No Bills）、加勒国家博物馆（National Museum Galle）"}}}}}, "shandong-2024": {"title": "山东、河南、山西、河北", "excerpt": "中国中北部的公路旅行。", "blocks": {"0": {"items": {"0": {"location": "山东济宁梁山 · 水泊梁山"}, "1": {"location": "河南安阳 · 殷墟"}, "2": {"location": "河北邢台 · 达活泉公园"}, "3": {"location": "山西晋中平遥 · 平遥古城"}, "4": {"location": "山西忻州五台 · 五台山"}, "5": {"location": "山西朔州应县 · 应县木塔"}, "6": {"location": "山西大同浑源 · 恒山、悬空寺"}, "7": {"location": "山西大同 · 云冈石窟、大同古城、九龙壁、代王府"}, "8": {"location": "河北张家口张北 · 草原天路"}, "9": {"location": "山东济南 · 趵突泉"}}}}}, "uk-2024": {"title": "英国", "excerpt": "在英国的游学之旅，自己规划了独自旅行。很怀念那些白崖！", "blocks": {"0": {"items": {"0": {"location": "利兹 · 利兹大学（University of Leeds）"}, "1": {"location": "利兹 · 利兹大学（University of Leeds）、市中心"}, "2": {"location": "约克 · 圣玛丽修道院（St Mary’s Abbey）、约克大教堂（York Minster）、肉铺街（Shambles）"}, "3": {"location": "斯基普顿（Skipton） · 博尔顿修道院（Bolton Abbey）"}, "4": {"location": "伊尔克利（Ilkley） · 镇中心"}, "5": {"location": "利兹 · 哈伍德庄园（Harewood House）"}, "6": {"location": "惠特比（Whitby） · 镇中心、惠特比修道院（Whitby Abbey）"}, "7": {"location": "索尔兹伯里（Salisbury） · 巨石阵（Stonehenge）"}, "8": {"location": "伦敦 · 塔桥（Tower Bridge）、伦敦塔（Tower of London）、格林尼治皇家天文台（Royal Observatory Greenwich）"}, "9": {"location": "伦敦 · 威斯敏斯特宫（Palace of Westminster）、大本钟（Big Ben）、伦敦眼（London Eye）、威斯敏斯特教堂（Westminster Abbey）、白金汉宫（Buckingham Palace）"}, "10": {"location": "锡福德（Seaford） · 七姐妹郊野公园（Seven Sisters Country Park）"}, "11": {"location": "伦敦 · 纽约大学伦敦校区（NYU London）、大英博物馆（British Museum）"}}}}}, "heilongjiang-2024": {"title": "黑龙江", "excerpt": "黑龙江的公路旅行，去了中国的最北端和最东端。", "blocks": {"0": {"items": {"0": {"location": "从哈尔滨到漠河"}, "1": {"location": "漠河 · 北极村"}, "2": {"location": "漠河 · 北极村"}, "3": {"location": "从漠河到呼玛"}, "4": {"location": "从黑河到五大连池到北安"}, "5": {"location": "五大连池"}, "6": {"location": "抚远 · 东极阁、东极广场、南岗村"}, "7": {"location": "哈尔滨 · 圣索菲亚教堂"}}}}}, "guangxi-2024": {"title": "广西", "excerpt": "广西的公路旅行。", "blocks": {"0": {"items": {"0": {"location": "从南宁到东兴"}, "1": {"location": "防城港东兴 · 东兴口岸"}, "2": {"location": "北海 · 银滩"}, "3": {"location": "北海 · 冠头岭、海底世界、大墩海"}}}}}, "yunnan-2024": {"title": "云南、西藏", "excerpt": "中国西南的公路旅行。像民族志学者一样参加了一场当地庆典！", "blocks": {"0": {"items": {"0": {"location": "从四川成都到西藏林芝"}, "1": {"location": "从林芝到西藏墨脱 · 嘎隆拉隧道"}, "2": {"location": "西藏林芝墨脱 · 巴登村、巴登老村、格林村观景台"}, "3": {"location": "从墨脱到西藏林芝波密"}, "4": {"location": "西藏昌都八宿 · 怒江七十二拐"}, "5": {"location": "西藏昌都芒康 · 如美镇"}, "6": {"location": "从西藏芒康到云南贡山"}, "7": {"location": "云南德钦 · 梅里雪山"}, "8": {"location": "云南怒江泸水 · 片马镇"}, "9": {"location": "云南怒江泸水"}, "10": {"location": "云南腾冲 · 和顺古镇、热海"}, "11": {"location": "云南德宏瑞丽 · 一寨两国、瑞丽口岸"}, "12": {"location": "云南德宏芒市 · 傣王宫"}}}}}, "boston-2024": {"title": "美国马萨诸塞州波士顿", "excerpt": "去哈佛参加会议。", "blocks": {"0": {"items": {"0": {"location": "波士顿 · 哈佛大学（Harvard University）"}}}}}, "washington-2024": {"title": "美国华盛顿州", "excerpt": "春假的华盛顿州公路旅行。很怀念奥林匹克国家公园（Olympic National Park）和那里的汉堡。", "blocks": {"0": {"items": {"0": {"location": "西雅图 · 太空针塔（Space Needle）"}, "1": {"location": "奥林匹克国家公园（Olympic National Park）"}, "2": {"location": "奥林匹克国家公园（Olympic National Park） · 新月湖（Lake Crescent）、里亚托海滩（Rialto Beach）"}, "3": {"location": "奥林匹克国家公园（Olympic National Park） · 霍河雨林（Hoh Rainforest）"}, "4": {"location": "西雅图"}}}}}, "fujian-2023": {"title": "福建、广东", "excerpt": "中国东南的公路旅行。", "blocks": {"0": {"items": {"0": {"location": "福建龙岩永定 · 永定土楼"}, "1": {"location": "福建龙岩永定 · 永定土楼"}, "2": {"location": "广东中山 · 孙中山故居"}, "3": {"location": "广东深圳 · 世界之窗"}, "4": {"location": "广东潮州 · 广济桥"}}}}}, "jiangxi-2023": {"title": "江西", "excerpt": "江西短途旅行。", "blocks": {"0": {"items": {"0": {"location": "婺源 · 篁岭、婺女洲"}, "1": {"location": "南昌 · 江西省博物馆、滕王阁"}, "2": {"location": "南昌 · 海昏侯国遗址公园"}}}}}, "henan-2023": {"title": "河南", "excerpt": "河南短途旅行。", "blocks": {"0": {"items": {"0": {"location": "洛阳 · 龙门石窟"}, "1": {"location": "洛阳 · 老君山"}}}}}, "beijing-2023": {"title": "北京", "excerpt": "时隔十多年再次来到北京。", "blocks": {"0": {"items": {"0": {"location": "北京大学清华大学圆明园"}, "1": {"location": "故宫天坛"}, "2": {"location": "水立方鸟巢八达岭长城"}, "3": {"location": "环球影城天安门广场"}, "4": {"location": "颐和园"}}}}}, "jiangsu-2023": {"title": "江苏", "excerpt": "两次分开的江苏一日游。", "blocks": {"0": {"items": {"0": {"location": "苏州 · 虎丘、拙政园、平江路"}, "1": {"location": "南京 · 夫子庙秦淮河、大报恩寺"}}}}}, "anhui-2023": {"title": "安徽", "excerpt": "春假的安徽短途旅行。", "blocks": {"0": {"items": {"0": {"location": "黄山 · 西递"}, "1": {"location": "黄山 · 宏村"}}}}}, "utah-2022": {"title": "美国犹他州", "excerpt": "犹他州的公路旅行。", "blocks": {"0": {"items": {"0": {"location": "大盐湖（Great Salt Lake）"}, "1": {"location": "锡安国家公园（Zion National Park）"}, "2": {"location": "廷帕诺戈斯洞穴国家保护区（Timpanogos Cave National Monument）"}, "3": {"location": "西班牙福克（Spanish Fork）、尤里卡（Eureka）"}}}}}, "mexico-miami-2022": {"title": "墨西哥", "excerpt": "全程乘坐公共交通的墨西哥之旅。", "blocks": {"0": {"items": {"0": {"location": "墨西哥金塔纳罗奥州 · 坎昆"}, "1": {"location": "墨西哥尤卡坦州 · 巴利亚多利德（Valladolid）、奇琴伊察（Chichén Itzá）"}, "2": {"location": "墨西哥金塔纳罗奥州坎昆 · 海豚海滩（Playa Delfines）、坎昆玛雅博物馆（Maya Museum of Cancún）"}, "3": {"location": "墨西哥墨西哥城 · 大都会主教座堂（Metropolitan Cathedral）、国家宫（National Palace）、艺术宫（Palacio de Bellas Artes）、独立天使纪念柱（Angel of Independence）、国立人类学博物馆（National Museum of Anthropology）"}, "4": {"location": "墨西哥墨西哥州 · 特奥蒂瓦坎（Teotihuacán）"}, "5": {"location": "美国佛罗里达州迈阿密 · 迈阿密海滩（Miami Beach）"}}}}}, "los-angeles-2022": {"title": "美国加利福尼亚州洛杉矶", "excerpt": "洛杉矶短途旅行。", "blocks": {"0": {"items": {"0": {"location": "好莱坞星光大道（Hollywood Walk of Fame）、圣莫尼卡海滩（Santa Monica Beach）"}, "1": {"location": "格里菲斯天文台（Griffith Observatory）、维多利亚花园（Victoria Gardens）"}}}}}, "yunnan-2021": {"title": "云南", "excerpt": "云南之旅。", "blocks": {"0": {"items": {"0": {"location": "昆明 · 石林、滇池"}, "1": {"location": "大理 · 大理古城、崇圣寺三塔、洱海"}, "2": {"location": "丽江 · 丽江古城、玉龙雪山、虎跳峡"}, "3": {"location": "香格里拉"}, "4": {"location": "香格里拉 · 普达措"}, "5": {"location": "丽江 · 拉市海、丽江古城"}}}}}, "hunan-2020": {"title": "湖南、贵州、四川", "excerpt": "中国西南之旅。", "blocks": {"0": {"items": {"0": {"location": "湖南岳阳 · 岳阳楼"}, "1": {"location": "湖南湘西 · 凤凰古城"}, "2": {"location": "贵州铜仁 · 梵净山、亚木沟"}, "3": {"location": "贵州遵义 · 遵义会址"}, "4": {"location": "四川乐山 · 乐山大佛"}, "5": {"location": "四川乐山 · 峨眉山"}, "6": {"location": "四川成都 · 琴台路、杜甫草堂"}, "7": {"location": "四川阿坝 · 汶川遗址"}, "8": {"location": "四川成都 · 宽窄巷子"}, "9": {"location": "四川德阳 · 三星堆博物馆"}}}}}, "tibet-2019": {"title": "西藏", "excerpt": "西藏之旅。", "blocks": {"0": {"items": {"0": {"location": "林芝 · 卡定沟、天佛瀑布、雅鲁藏布大峡谷"}, "1": {"location": "林芝 · 巴松措"}, "2": {"location": "拉萨 · 布达拉宫"}, "3": {"location": "拉萨 · 大昭寺、八廓街"}, "4": {"location": "山南 · 羊卓雍措"}, "5": {"location": "日喀则 · 满拉水库、斯米拉山"}, "6": {"location": "日喀则 · 珠穆朗玛峰、释迦牟尼祈福台、扎什伦布寺"}, "7": {"location": "拉萨 · 念青唐古拉山、那根拉山口、纳木错"}}}}}, "utah-2019": {"title": "美国犹他州", "excerpt": "犹他州之旅。", "blocks": {"0": {"items": {"0": {"location": "峡谷地国家公园（Canyonlands National Park）"}}}}}, "gansu-2018": {"title": "甘肃、新疆", "excerpt": "中国西北之旅。", "blocks": {"0": {"items": {"0": {"location": "甘肃兰州 · 黄河"}, "1": {"location": "甘肃嘉峪关 · 嘉峪关"}, "2": {"location": "甘肃酒泉 · 鸣沙山月牙泉"}, "3": {"location": "甘肃酒泉 · 莫高窟"}, "4": {"location": "新疆吐鲁番 · 火焰山、葡萄沟"}, "5": {"location": "新疆昌吉 · 天山天池"}, "6": {"location": "新疆乌鲁木齐 · 国际大巴扎"}, "7": {"location": "新疆阿勒泰 · 喀纳斯"}, "8": {"location": "新疆克拉玛依 · 魔鬼城"}}}}}, "shaanxi-2018": {"title": "陕西", "excerpt": "陕西短途旅行。", "blocks": {"0": {"items": {"0": {"location": "咸阳 · 乾陵、无字碑、懿德太子墓"}, "1": {"location": "西安 · 大雁塔"}, "2": {"location": "渭南 · 华山"}, "3": {"location": "西安 · 秦始皇陵"}}}}}, "guangxi-2018": {"title": "广西", "excerpt": "广西短途旅行。", "blocks": {"0": {"items": {"0": {"location": "崇左 · 友谊关"}, "1": {"location": "崇左 · 德天瀑布"}}}}}, "shandong-2017": {"title": "山东、辽宁、内蒙古、黑龙江、河北", "excerpt": "中国北方的公路旅行。", "blocks": {"0": {"items": {"0": {"location": "山东日照 · 万平口海滨"}, "1": {"location": "山东青岛 · 五四广场"}, "2": {"location": "山东烟台"}, "3": {"location": "辽宁大连 · 黄渤海分界线"}, "4": {"location": "辽宁丹东 · 鸭绿江"}, "5": {"location": "辽宁沈阳 · 沈阳故宫"}, "6": {"location": "内蒙古呼伦贝尔 · 呼和诺尔、满洲里"}, "7": {"location": "黑龙江齐齐哈尔 · 扎龙"}, "8": {"location": "河北秦皇岛 · 山海关"}, "9": {"location": "山东泰安 · 泰山"}}}}}, "hunan-2016": {"title": "湖南、湖北", "excerpt": "华中之旅。", "blocks": {"0": {"items": {"0": {"location": "湖南长沙 · 橘子洲"}, "1": {"location": "湖南湘潭 · 毛泽东故居"}, "2": {"location": "湖南张家界 · 天门山、张家界国家森林公园"}, "3": {"location": "湖北神农架"}, "4": {"location": "湖北宜昌 · 三峡大坝"}, "5": {"location": "湖北荆州 · 荆州博物馆、荆州古城"}, "6": {"location": "湖北武汉 · 黄鹤楼"}}}}}, "japan-2016": {"title": "日本", "excerpt": "学校组织的日本之旅。", "blocks": {"0": {"items": {"0": {"location": "东京 · 杉并动画博物馆（Suginami Animation Museum）"}, "1": {"location": "大阪"}, "2": {"location": "京都 · 清水寺（Kiyomizu-dera）"}, "3": {"location": "奈良 · 东大寺（Tōdai-ji）"}}}}}, "egypt-2016": {"title": "埃及", "excerpt": "埃及之旅。第一次去非洲。", "blocks": {"0": {"items": {"0": {"location": "卢克索 · 门农巨像（Colossi of Memnon）、尼罗河（Nile River）、卢克索神庙（Luxor Temple）、卡纳克神庙（Karnak Temple）、哈特谢普苏特神庙（Temple of Hatshepsut）"}, "1": {"location": "开罗 · 吉萨金字塔（Pyramids of Giza）、狮身人面像（Great Sphinx）、尼罗河（Nile River）"}}}}}, "qinghai-gansu-2016": {"title": "青海、甘肃", "excerpt": "日期不详。", "blocks": {"0": {"items": {"0": {"location": "青海海南 · 青海湖"}, "1": {"location": "甘肃酒泉 · 鸣沙山月牙泉、莫高窟、玉门关"}}}}}, "arizona-2014": {"title": "美国亚利桑那州、内华达州、加利福尼亚州", "excerpt": "美国西部的公路旅行。", "blocks": {"0": {"items": {"0": {"location": "亚利桑那州 · 大峡谷国家公园（Grand Canyon National Park）"}, "1": {"location": "内华达州 · 拉斯维加斯、胡佛水坝（Hoover Dam）"}, "2": {"location": "加利福尼亚州 · 死亡谷国家公园（Death Valley National Park）"}, "3": {"location": "内华达州 · 大盆地国家公园（Great Basin National Park）"}, "4": {"location": "怀俄明州 · 大提顿国家公园（Grand Teton National Park）"}}}}}, "washington-d-c-2014": {"title": "美国华盛顿特区、纽约州、马萨诸塞州", "excerpt": "美国东部之旅。", "blocks": {"0": {"items": {"0": {"location": "华盛顿特区 · 美国国会大厦（U.S. Capitol）、白宫（White House）"}, "1": {"location": "纽约州 · 尼亚加拉瀑布（Niagara Falls）"}, "2": {"location": "马萨诸塞州剑桥（Cambridge） · 哈佛大学（Harvard University）"}, "3": {"location": "纽约州纽约市 · 纽约证券交易所（New York Stock Exchange）、帝国大厦（Empire State Building）、自由女神像（Statue of Liberty）"}}}}}, "utah-2014": {"title": "美国犹他州、科罗拉多州、怀俄明州", "excerpt": "美国西部的公路旅行。", "blocks": {"0": {"items": {"0": {"location": "犹他州 · 拱门国家公园（Arches National Park）"}, "1": {"location": "科罗拉多州 · 落基山国家公园（Rocky Mountain National Park）"}, "2": {"location": "怀俄明州 · 黄石国家公园（Yellowstone National Park）"}, "3": {"location": "犹他州 · 大盐湖（Great Salt Lake）"}}}}}, "cambodia-2014": {"title": "柬埔寨", "excerpt": "柬埔寨之旅。", "blocks": {"0": {"items": {"0": {"location": "暹粒 · 吴哥窟（Angkor Wat）"}, "1": {"location": "暹粒 · 崩密列（Beng Mealea）"}}}}}, "beijing-2010": {"title": "北京", "excerpt": "北京之旅。", "blocks": {"0": {"items": {"0": {"location": "水立方长城"}, "1": {"location": "圆明园"}}}}}, "shanxi-2010": {"title": "山西", "excerpt": "山西之旅。", "blocks": {"0": {"items": {"0": {"location": "晋中平遥 · 平遥古城"}}}}}};
+if (ZH) Object.entries(ZH_POSTS).forEach(([id, o]) => { const p = BLOG_POSTS.find(x => x.id === id); if (p) mergeInto(p, o); });
+
 const blogEl = document.getElementById("blog");
 const blogCols = document.getElementById("blogCols");
 const blogIndex = document.getElementById("blogIndex");
@@ -3799,7 +4252,7 @@ function renderBlog() {
   const nCols = getComputedStyle(blogCols).gridTemplateColumns.split(" ").length;
   blogCols.innerHTML = `<div class="blog-col"></div>`.repeat(nCols);
   const cols = [...blogCols.children];
-  if (!posts.length) cols[0].innerHTML = `<p class="blog-empty">No posts here yet. Check back soon.</p>`;
+  if (!posts.length) cols[0].innerHTML = `<p class="blog-empty">${T("No posts here yet. Check back soon.", "暂无文章，敬请期待。")}</p>`;
   const single = getComputedStyle(blogCols).gridTemplateColumns.split(" ").length < 2;
   posts.forEach(p => {
     const target = single ? cols[0] : cols.reduce((a, c) => c.offsetHeight < a.offsetHeight ? c : a);   // shortest column
@@ -3919,7 +4372,7 @@ function openPost(id) {
     <div class="post-meta"><span>${p.date}</span>${p.keywords && p.keywords.length ? `<span>${tagList(p.keywords)}</span>` : ""}</div>
     <div class="post-content">${p.blocks.map(blockHTML).join("")}</div>
     <div class="post-foot"><span>${catName(p.category)} | ${p.date}</span>
-      ${next && next !== p ? `<a class="post-next" href="#" data-next="${next.id}"><span>Next: ${next.title}</span>${'<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg>'}</a>` : ""}</div>`;
+      ${next && next !== p ? `<a class="post-next" href="#" data-next="${next.id}"><span>${T("Next", "下一篇")}: ${next.title}</span>${'<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M8 3l4 4-4 4"/></svg>'}</a>` : ""}</div>`;
   // images and galleries open in the photo viewer
   p.blocks.forEach((b, bi) => {
     const blockEl = postBody.querySelector(".post-content").children[bi];
@@ -3953,6 +4406,36 @@ addEventListener("keydown", e => { if (e.key === "Escape" && !postModal.hidden &
 
 /* ---------- Init ---------- */
 observeVideos();
+if (ZH) {   // static text in the page markup
+  document.documentElement.lang = "zh-CN";
+  const set = (sel, html) => document.querySelectorAll(sel).forEach(el => { el.innerHTML = html; });
+  const nav = document.querySelector(".nav");
+  set('.nav a[data-route="home"]', "项目"); set('.nav a[data-route="cases"]', "案例研究"); set('.nav a[data-route="about"]', "关于");
+  const trig = nav.querySelectorAll(".nav-trigger");
+  trig[0].firstChild.textContent = "联系";
+  trig[1].querySelector("span").textContent = "更多链接";
+  nav.querySelector('a[href^="mailto:"] span').textContent = "邮箱";
+  nav.querySelector('.menu a[href="#photos"] span').textContent = "摄影";
+  nav.querySelector('.menu a[href="#blogs"] span').textContent = "博客";
+  const t = document.getElementById("langToggle");
+  t.textContent = "EN"; t.lang = "en"; t.setAttribute("aria-label", "Switch to English");
+  set("#home .intro h1", "面向文化遗产<br>与教育的<br>数字阐释");
+  set("#home .intro h1 + p", "我设计并开发数字体验，借助技术与叙事，将人们与文化、历史和地方联系起来。");
+  set("#cases .intro h1", "案例研究");
+  set("#cases .intro h1 + p", "深入展示我如何研究、设计并构建数字阐释项目，连接实体空间与数字平台。");
+  set("#gallery h1", "摄影"); set("#blog h1", "博客");
+  document.querySelectorAll(".site-footer > span:first-child, p.copyright").forEach(el => { el.innerHTML = `© <span class="cy-year">2026</span> Evaine Sun. 保留所有权利。`; });
+  document.querySelectorAll('.site-footer a[href="#"]').forEach(a => { a.textContent = "回到顶部 ↑"; });
+  document.querySelectorAll(".hint").forEach(b => { b.title = "滚动或拖动浏览"; b.setAttribute("aria-label", "下一个（或滚动 / 拖动浏览）"); });
+  document.querySelector("#soon .cs-kicker").textContent = "即将上线";
+  document.querySelector("#soon .soon-sub").textContent = "在此期间，欢迎浏览网站的其他内容：";
+  const sl = document.querySelectorAll("#soon .soon-links span"); ["项目", "案例研究", "关于"].forEach((x, i) => { if (sl[i]) sl[i].textContent = x; });
+  document.querySelector(".post-close").setAttribute("aria-label", "关闭文章");
+  document.querySelector(".lb-close").setAttribute("aria-label", "关闭");
+  document.querySelector(".lb-prev").setAttribute("aria-label", "上一张");
+  document.querySelector(".lb-next").setAttribute("aria-label", "下一张");
+}
+document.getElementById("langToggle").addEventListener("click", () => setLang(ZH ? "en" : "zh"));
 document.querySelectorAll(".cy-year").forEach(n => n.textContent = new Date().getFullYear());
 syncHeaderH();
 const refreshAll = () => { syncHeaderH(); projectsWheel.refresh(); casesWheel.refresh(); if (!detailEl.hidden) { fitIntro(); updateSections(); } };
